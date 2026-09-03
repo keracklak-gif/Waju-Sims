@@ -30,6 +30,7 @@ var save_data: Dictionary = {
 		"p3_eq_bh_prio": 0,   # [D>S>A, S>D>A, Double]
 		"p5_strat": 0,
 		"p5_start_point" : 0,
+		"p4_bobot_callouts": true,
 		#"p4_ct_aero_plant": false,
 	},
 	## FRU Waymarks
