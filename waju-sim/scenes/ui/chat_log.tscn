@@ -1,0 +1,117 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/chat_log.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://assets/common/fonts/eurostarregularextended.ttf" id="2_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_chatbg"]
+bg_color = Color(0, 0, 0, 0.65)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_moveuibg"]
+bg_color = Color(0.267, 0.267, 0.267, 0.741)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.780392, 0.501961, 0.360784, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_moveuilabel"]
+font = ExtResource("2_font")
+font_size = 20
+outline_size = 3
+outline_color = Color(0.780392, 0.501961, 0.360784, 1)
+
+[node name="ChatLog" type="CanvasLayer"]
+script = ExtResource("1_script")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_left = 0.016
+anchor_top = 0.62
+anchor_right = 0.016
+anchor_bottom = 0.62
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="Panel" type="Panel" parent="MarginContainer"]
+custom_minimum_size = Vector2(380, 190)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_chatbg")
+
+[node name="MoveUIBG" type="Panel" parent="MarginContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_moveuibg")
+
+[node name="Label" type="Label" parent="MarginContainer/MoveUIBG"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 139.0
+offset_bottom = 35.0
+text = "Chat Log"
+label_settings = SubResource("LabelSettings_moveuilabel")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 2
+
+[node name="Messages" type="RichTextLabel" parent="MarginContainer/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=#7ec8ff][20:45] [Orchestrion] Now playing \"Distant Worlds.\"[/color]
+[color=#ffffff][20:46] Ashe T. invites you to a party.[/color]
+[color=#ffffff][20:46] You join Ashe T.'s party.[/color]
+[color=#ffffff][20:47] Boko R. has logged in.[/color]
+[color=#ffd966][20:47] Real[/color]
+[color=#ffd966][20:47] Fake[/color]
+[color=#ff6b6b][20:47] The command /example does not exist.[/color]
+[color=#ffffff][20:55] 42 parties recruiting; none match your search.[/color]"
+fit_content = false
+scroll_active = true
+theme_override_constants/line_separation = 0
+theme_override_fonts/normal_font = ExtResource("2_font")
+theme_override_font_sizes/normal_font_size = 13
+
+[node name="Tabs" type="HBoxContainer" parent="MarginContainer/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="General" type="Label" parent="MarginContainer/Panel/VBoxContainer/Tabs"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = "General"
+
+[node name="Battle" type="Label" parent="MarginContainer/Panel/VBoxContainer/Tabs"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Battle"
+
+[node name="Event" type="Label" parent="MarginContainer/Panel/VBoxContainer/Tabs"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Event"
+
+[node name="Party" type="Label" parent="MarginContainer/Panel/VBoxContainer/Tabs"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Party"
+
+[connection signal="gui_input" from="MarginContainer" to="." method="_on_margin_container_gui_input"]
