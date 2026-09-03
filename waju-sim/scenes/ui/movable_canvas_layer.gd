@@ -21,7 +21,8 @@ const DEFAULT_UI_POSITIONS = {
 	"fail_list": [0.028, 0.201],
 	"party_list": [0.706, 0.279],
 	"player_debuffs": [0.576, 0.667],
-	"enmity_cast_bar": [0.174, 0.711]
+	"enmity_cast_bar": [0.174, 0.711],
+	"chat_log": [0.016, 0.62]
 }
 const DEFAULT_UI_SCALES = {
 	"action_bar": Vector2(1, 1),
@@ -29,7 +30,8 @@ const DEFAULT_UI_SCALES = {
 	"fail_list": Vector2(1, 1),
 	"party_list": Vector2(1, 1),
 	"player_debuffs": Vector2(2, 2),
-	"enmity_cast_bar": Vector2(0.85, 0.85)
+	"enmity_cast_bar": Vector2(0.85, 0.85),
+	"chat_log": Vector2(1, 1)
 }
 const UI_SCALE_INCREMENT = Vector2(0.05, 0.05)
 

@@ -96,6 +96,7 @@ const DEBUFF_ORDER := ["black_wound", "white_wound", "beyond_death", "allagan_fi
 @onready var gac: GroundAoeController = %GroundAoEController
 @onready var encounter_menu: CanvasLayer = %EncounterMenu
 @onready var fail_list: FailList = %FailList
+@onready var chat_log: ChatLog = %ChatLog
 @onready var p4_anim: AnimationPlayer = %P4Anim
 
 
@@ -150,6 +151,7 @@ var cone_2_tar: Vector2
 
 func start_sequence(new_party: Dictionary) -> void:
 	assert(new_party != null, "Error. Where the party at?")
+	chat_log.clear_messages()
 	gac.preload_aoe(["line", "circle", "cone", "donut"])
 	#ResourceLoader.load_threaded_request(NEO_EXD_UID)
 	target_controller.add_targetable_npc(kefka)
@@ -279,6 +281,10 @@ func cast_gc(gc_num: int):
 		push_error("Invalid index in cast_gc.")
 	enemy_cast_bar.cast("Grand Cross", 8.8)
 	neo_exdeath.show_orbs(neo_fake)
+	if DmuSavedVariables.get_data_and_check_bool("settings", "p4_bobot_callouts") and gc_num <= 2:
+		var ordinal := "1ST" if gc_num == 1 else "2ND"
+		var tell := "FAKE (Look In)" if neo_fake else "REAL (Look Away)"
+		chat_log.add_message("--- %s GAZE %s ---" % [ordinal, tell])
 	# TODO: GC cast anim
 
 
@@ -309,12 +315,17 @@ func mm_hit():
 
 # 08.7 - Cast Inferno/Tsunami (8.7s), Chaos orbs
 func cast_chaos(num: int):
+	var bobot_callouts: bool = DmuSavedVariables.get_data_and_check_bool("settings", "p4_bobot_callouts")
 	if (num == 1 and inferno_first) or (num == 2 and !inferno_first):
 		enemy_cast_bar.cast("Inferno", 8.7)
 		chaos.show_orbs(inferno_fake)
+		if bobot_callouts:
+			chat_log.add_message("--- FIRE IS %s ---" % ("DONUT" if inferno_fake else "TWISTER"))
 	else:
 		enemy_cast_bar.cast("Tsunami", 8.7)
 		chaos.show_orbs(tsunami_fake)
+		if bobot_callouts:
+			chat_log.add_message("--- WATER IS %s ---" % ("TWISTER" if tsunami_fake else "DONUT"))
 
 
 # 12.6 - Assign Neo debuffs 1 (2 Lightning, 2 Water, 4 Accel (2 short/2 long), 2 Shriek)
