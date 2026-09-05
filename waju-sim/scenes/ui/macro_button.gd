@@ -47,7 +47,11 @@ func apply_config() -> void:
 
 
 func _on_pressed() -> void:
-	if Global.spectate_mode or Global.is_moving_ui:
+	# Spectating only freezes the player's own movement/fail-checks - the
+	# player character (and its Lockon/TargetMarker node) still exists in the
+	# party, so macros stay usable for practicing callouts and self-marks
+	# without controlling a character.
+	if Global.is_moving_ui:
 		return
 	if macro_text.is_empty() and marker_key.is_empty():
 		return
