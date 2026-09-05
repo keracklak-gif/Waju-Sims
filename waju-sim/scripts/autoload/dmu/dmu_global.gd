@@ -85,13 +85,13 @@ const P4_MACROS: Array[Dictionary] = [
 # (The marker scenes these "marker" keys resolve to need their own export
 # anchor - see the comment on TargetMarkerController.marker_scene_paths.)
 #
-# Both arrays end with the same two Echo-only reminder macros (Acceleration
-# Bomb's real behavior is "stay still" despite the name; its fake tell is
-# "keep moving") - these are plain "text" macros like P4_MACROS, but posted to
-# EchoChatLog instead of the party ChatLog since they're a private self-note,
-# not a party callout. Icons are FFXIV's own Play/Pause macro-icon-picker
-# tiles (same grey tile family as the rest), matching the action each button
-# reminds the player to take rather than the debuff's misleading name.
+# Both arrays end with the same two Echo-only reminder macros: real
+# Acceleration Bomb requires standing still, its fake tell requires moving -
+# these are plain "text" macros like P4_MACROS, but posted to EchoChatLog
+# instead of the party ChatLog since they're a private self-note, not a party
+# callout. Icons are FFXIV's own Play/Pause macro-icon-picker tiles (same
+# grey tile family as the rest), matching the action each button reminds the
+# player to take rather than the debuff's misleading name.
 const LABEL_MACROS_SUP: Array[Dictionary] = [
 	{
 		"marker": "stop_1",
@@ -104,13 +104,13 @@ const LABEL_MACROS_SUP: Array[Dictionary] = [
 		"icon": preload("res://assets/common/icons/macro_icons/cancel2_icon.png"),
 	},
 	{
-		"text": "--- ACCELERATION (Stay Still) ---",
-		"tooltip": "Echo-only reminder: Acceleration Bomb - stay still.",
+		"text": "--- REAL ACCELERATION (Stand Still) ---",
+		"tooltip": "Echo-only reminder: Real Acceleration Bomb - stand still.",
 		"icon": preload("res://assets/common/icons/macro_icons/stay_still_icon.png"),
 	},
 	{
-		"text": "--- STILLNESS (Keep Moving) ---",
-		"tooltip": "Echo-only reminder: Stillness - keep moving.",
+		"text": "--- FAKE ACCELERATION (Keep Moving) ---",
+		"tooltip": "Echo-only reminder: Fake Acceleration Bomb - keep moving.",
 		"icon": preload("res://assets/common/icons/macro_icons/keep_moving_icon.png"),
 	},
 ]
@@ -127,13 +127,13 @@ const LABEL_MACROS_DPS: Array[Dictionary] = [
 		"icon": preload("res://assets/common/icons/macro_icons/chain2_icon.png"),
 	},
 	{
-		"text": "--- ACCELERATION (Stay Still) ---",
-		"tooltip": "Echo-only reminder: Acceleration Bomb - stay still.",
+		"text": "--- REAL ACCELERATION (Stand Still) ---",
+		"tooltip": "Echo-only reminder: Real Acceleration Bomb - stand still.",
 		"icon": preload("res://assets/common/icons/macro_icons/stay_still_icon.png"),
 	},
 	{
-		"text": "--- STILLNESS (Keep Moving) ---",
-		"tooltip": "Echo-only reminder: Stillness - keep moving.",
+		"text": "--- FAKE ACCELERATION (Keep Moving) ---",
+		"tooltip": "Echo-only reminder: Fake Acceleration Bomb - keep moving.",
 		"icon": preload("res://assets/common/icons/macro_icons/keep_moving_icon.png"),
 	},
 ]
