@@ -12,7 +12,6 @@ outline_color = Color(0, 0, 0, 1)
 [node name="MacroButton" type="TextureButton"]
 custom_minimum_size = Vector2(45, 45)
 focus_mode = 0
-mouse_filter = 1
 ignore_texture_size = true
 stretch_mode = 0
 script = ExtResource("1_script")
