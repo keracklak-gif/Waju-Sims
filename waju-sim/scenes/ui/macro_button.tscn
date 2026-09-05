@@ -1,0 +1,44 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/macro_button.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://assets/common/fonts/MYRIADPRO-BOLD.OTF" id="2_font"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_badge"]
+font = ExtResource("2_font")
+font_size = 12
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[node name="MacroButton" type="TextureButton"]
+custom_minimum_size = Vector2(45, 45)
+focus_mode = 0
+mouse_filter = 1
+ignore_texture_size = true
+stretch_mode = 0
+script = ExtResource("1_script")
+
+[node name="SpamTimer" type="Timer" parent="."]
+unique_name_in_owner = true
+one_shot = true
+
+[node name="BadgeMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 14.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 5
+
+[node name="BadgeLabel" type="Label" parent="BadgeMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+label_settings = SubResource("LabelSettings_badge")
+clip_text = true
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]
+[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

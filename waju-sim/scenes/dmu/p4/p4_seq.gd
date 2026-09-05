@@ -97,6 +97,7 @@ const DEBUFF_ORDER := ["black_wound", "white_wound", "beyond_death", "allagan_fi
 @onready var encounter_menu: CanvasLayer = %EncounterMenu
 @onready var fail_list: FailList = %FailList
 @onready var chat_log: ChatLog = %ChatLog
+@onready var macro_bar: MacroBar = %MacroBar
 @onready var p4_anim: AnimationPlayer = %P4Anim
 
 
@@ -162,8 +163,20 @@ func start_sequence(new_party: Dictionary) -> void:
 	instantiate_party(new_party)
 	on_toggle_bots_visible()
 	encounter_menu.toggle_bots_visible.connect(on_toggle_bots_visible)
+	setup_macro_bar()
+	encounter_menu.toggle_macro_bar.connect(on_toggle_macro_bar)
 	p4_anim.play("p4_anim")
 	#p4_anim.play_section("p4_anim", 40.0)
+
+
+func setup_macro_bar() -> void:
+	macro_bar.set_macros(DmuGlobal.P4_MACROS)
+	macro_bar.macro_used.connect(chat_log.add_player_message)
+	on_toggle_macro_bar(DmuSavedVariables.get_data_and_check_bool("settings", "p4_macro_bar"))
+
+
+func on_toggle_macro_bar(is_visible: bool) -> void:
+	macro_bar.visible = is_visible
 
 
 func instantiate_party(new_party):
