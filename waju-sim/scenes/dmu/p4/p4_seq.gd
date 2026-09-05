@@ -190,13 +190,15 @@ func on_toggle_macro_bar(is_visible: bool) -> void:
 
 # Builds the self-marking bar for the role the player picked. The party is torn
 # down and rebuilt whenever that changes, so the bar only needs building once.
-# One row of 4: the role's marker pair (self-mark), then the Acceleration/
-# Stillness Echo reminders, identical for every role.
+# Row 1: the role's marker pair (self-mark), then the Acceleration/Stillness
+# Echo reminders, identical for every role. Row 2: the Lightning/Ice
+# (Thrumming Thunder/Blizzard Blowout) Echo reminders, also identical for
+# every role.
 func setup_labeling_macro_bar() -> void:
 	self_mark_key = ""
 	var macros := DmuGlobal.LABEL_MACROS_SUP if player_key in Global.SUP_ROLE_KEYS\
 		else DmuGlobal.LABEL_MACROS_DPS
-	labeling_macro_bar.set_macros(macros, macros.size())
+	labeling_macro_bar.set_macros(macros, 4)
 	labeling_macro_bar.marker_used.connect(on_self_mark)
 	labeling_macro_bar.macro_used.connect(echo_chat_log.add_echo_message)
 	on_toggle_labeling_macros(DmuSavedVariables.get_data_and_check_bool("settings", "p4_labeling_macros"))

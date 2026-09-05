@@ -85,14 +85,21 @@ const P4_MACROS: Array[Dictionary] = [
 # (The marker scenes these "marker" keys resolve to need their own export
 # anchor - see the comment on TargetMarkerController.marker_scene_paths.)
 #
-# Both arrays end with the same two Echo-only reminder macros: real
+# Both arrays continue with the same two Echo-only reminder macros: real
 # Acceleration Bomb requires standing still, its fake tell requires moving -
 # these are plain "text" macros like P4_MACROS, but posted to EchoChatLog
 # instead of the party ChatLog since they're a private self-note, not a party
 # callout. Icons are FFXIV's own Play/Pause macro-icon-picker tiles (same
 # grey tile family as the rest), matching the action each button reminds the
 # player to take rather than the debuff's misleading name.
+#
+# Row 2 of both arrays adds four more Echo-only reminders for the Thrumming
+# Thunder III / Blizzard Blowout III tells (Lightning/Ice). No dedicated
+# element art for these yet, so - like Gaze in P4_MACROS - they reuse the
+# check/X real/fake glyphs, badged with the element letter to tell the two
+# pairs apart.
 const LABEL_MACROS_SUP: Array[Dictionary] = [
+	# Row 1
 	{
 		"marker": "stop_1",
 		"tooltip": "Mark yourself Cancel 1. Press again to clear.",
@@ -113,9 +120,35 @@ const LABEL_MACROS_SUP: Array[Dictionary] = [
 		"tooltip": "Echo-only reminder: Fake Acceleration Bomb - keep moving.",
 		"icon": preload("res://assets/common/icons/macro_icons/keep_moving_icon.png"),
 	},
+	# Row 2
+	{
+		"text": "--- REAL LIGHTNING ---",
+		"tooltip": "Echo-only reminder: the Thrumming Thunder tell is real.",
+		"icon": preload("res://assets/common/icons/macro_icons/gaze_real_icon.png"),
+		"badge": "L",
+	},
+	{
+		"text": "--- FAKE LIGHTNING ---",
+		"tooltip": "Echo-only reminder: the Thrumming Thunder tell is fake.",
+		"icon": preload("res://assets/common/icons/macro_icons/gaze_fake_icon.png"),
+		"badge": "L",
+	},
+	{
+		"text": "--- REAL ICE ---",
+		"tooltip": "Echo-only reminder: the Blizzard Blowout tell is real.",
+		"icon": preload("res://assets/common/icons/macro_icons/gaze_real_icon.png"),
+		"badge": "I",
+	},
+	{
+		"text": "--- FAKE ICE ---",
+		"tooltip": "Echo-only reminder: the Blizzard Blowout tell is fake.",
+		"icon": preload("res://assets/common/icons/macro_icons/gaze_fake_icon.png"),
+		"badge": "I",
+	},
 ]
 
 const LABEL_MACROS_DPS: Array[Dictionary] = [
+	# Row 1
 	{
 		"marker": "link_1",
 		"tooltip": "Mark yourself Chain 1. Press again to clear.",
@@ -135,6 +168,31 @@ const LABEL_MACROS_DPS: Array[Dictionary] = [
 		"text": "--- FAKE ACCELERATION (Keep Moving) ---",
 		"tooltip": "Echo-only reminder: Fake Acceleration Bomb - keep moving.",
 		"icon": preload("res://assets/common/icons/macro_icons/keep_moving_icon.png"),
+	},
+	# Row 2
+	{
+		"text": "--- REAL LIGHTNING ---",
+		"tooltip": "Echo-only reminder: the Thrumming Thunder tell is real.",
+		"icon": preload("res://assets/common/icons/macro_icons/gaze_real_icon.png"),
+		"badge": "L",
+	},
+	{
+		"text": "--- FAKE LIGHTNING ---",
+		"tooltip": "Echo-only reminder: the Thrumming Thunder tell is fake.",
+		"icon": preload("res://assets/common/icons/macro_icons/gaze_fake_icon.png"),
+		"badge": "L",
+	},
+	{
+		"text": "--- REAL ICE ---",
+		"tooltip": "Echo-only reminder: the Blizzard Blowout tell is real.",
+		"icon": preload("res://assets/common/icons/macro_icons/gaze_real_icon.png"),
+		"badge": "I",
+	},
+	{
+		"text": "--- FAKE ICE ---",
+		"tooltip": "Echo-only reminder: the Blizzard Blowout tell is fake.",
+		"icon": preload("res://assets/common/icons/macro_icons/gaze_fake_icon.png"),
+		"badge": "I",
 	},
 ]
 
