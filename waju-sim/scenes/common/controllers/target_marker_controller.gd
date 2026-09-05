@@ -6,6 +6,18 @@
 extends Node
 class_name TargetMarkerController
 
+## Every path below is a plain string, resolved only at runtime via
+## ResourceLoader (add_marker/_ready). Godot's --export-release dependency
+## walker only discovers resources through an actual ext_resource/preload
+## reference, so scenes reachable solely as a string in this dict get
+## silently dropped from the .pck - the same "not in the export" failure as
+## the stripped-.import-stub gotcha in CLAUDE.md, but from a missing static
+## reference instead of a missing raw source. target_marker_controller.tscn
+## carries unused ext_resource declarations for stop_1/stop_2/link_1/link_2
+## (the ones the DMU P4 Labeling Macro Bar can place) purely as an export
+## anchor. The other 8 keys here - and DSR's own TargetMarkerControllerDSR,
+## used by P6's Akh Morn markers - have the same gap; nothing currently
+## exported depends on them, so it's unfixed until something does.
 @export var marker_scene_paths := {
 	"tar_1": "res://scenes/common/player_characters/lockon/target_markers/tar_1.tscn",
 	"tar_2": "res://scenes/common/player_characters/lockon/target_markers/tar_2.tscn",

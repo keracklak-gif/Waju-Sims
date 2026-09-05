@@ -45,7 +45,8 @@ layout_mode = 2
 mouse_filter = 1
 theme_override_styles/panel = SubResource("StyleBoxFlat_moveuibg")
 
-[node name="Label" type="Label" parent="MarginContainer/MoveUIBG"]
+[node name="MoveUILabel" type="Label" parent="MarginContainer/MoveUIBG"]
+unique_name_in_owner = true
 layout_mode = 0
 offset_left = 12.0
 offset_top = 10.0
@@ -84,6 +85,7 @@ theme_override_fonts/normal_font = ExtResource("2_font")
 theme_override_font_sizes/normal_font_size = 13
 
 [node name="Tabs" type="HBoxContainer" parent="MarginContainer/Panel/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
 
