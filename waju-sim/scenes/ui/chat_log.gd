@@ -7,6 +7,8 @@ extends MovableCanvasLayer
 class_name ChatLog
 
 const PARTY_CHAT_COLOR := Color(0.55, 0.85, 1.0)
+const BOBOT_NAME := "Bob Robotson"
+const PLAYER_NAME := "You"
 
 @onready var move_ui_bg: Panel = %MoveUIBG
 @onready var messages: RichTextLabel = $MarginContainer/Panel/VBoxContainer/Messages
@@ -19,7 +21,16 @@ func _ready():
 
 # Appends a line as if a party member ("Bob Robotson") typed it via macro.
 func add_message(text: String) -> void:
-	messages.append_text("[color=#%s][Party] Bob Robotson: %s[/color]\n" % [PARTY_CHAT_COLOR.to_html(false), text])
+	add_party_message(BOBOT_NAME, text)
+
+
+# Appends a line as if the player typed it via a chat macro.
+func add_player_message(text: String) -> void:
+	add_party_message(PLAYER_NAME, text)
+
+
+func add_party_message(sender: String, text: String) -> void:
+	messages.append_text("[color=#%s][Party] %s: %s[/color]\n" % [PARTY_CHAT_COLOR.to_html(false), sender, text])
 	messages.scroll_to_line(messages.get_line_count())
 
 
