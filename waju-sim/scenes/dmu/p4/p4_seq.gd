@@ -97,7 +97,10 @@ const DEBUFF_ORDER := ["black_wound", "white_wound", "beyond_death", "allagan_fi
 @onready var encounter_menu: CanvasLayer = %EncounterMenu
 @onready var fail_list: FailList = %FailList
 @onready var chat_log: ChatLog = %ChatLog
+@onready var echo_chat_log: ChatLog = %EchoChatLog
 @onready var macro_bar: MacroBar = %MacroBar
+@onready var labeling_macro_bar: MacroBar = %LabelingMacroBar
+@onready var target_marker_controller: TargetMarkerController = %TargetMarkerController
 @onready var p4_anim: AnimationPlayer = %P4Anim
 
 
@@ -116,6 +119,9 @@ var neo_rotation_deg: float
 #var short_acc_keys: Array
 #var long_acc_keys: Array
 var player_key: String
+## Marker the player has put on themselves via the Labeling Macro Bar, or ""
+## when unmarked. Only ever one at a time - pressing the active one clears it.
+var self_mark_key := ""
 var black_wound_keys: Array
 var white_wound_keys: Array
 var field_keys: Array
@@ -153,6 +159,7 @@ var cone_2_tar: Vector2
 func start_sequence(new_party: Dictionary) -> void:
 	assert(new_party != null, "Error. Where the party at?")
 	chat_log.clear_messages()
+	echo_chat_log.clear_messages()
 	gac.preload_aoe(["line", "circle", "cone", "donut"])
 	#ResourceLoader.load_threaded_request(NEO_EXD_UID)
 	target_controller.add_targetable_npc(kefka)
@@ -165,6 +172,8 @@ func start_sequence(new_party: Dictionary) -> void:
 	encounter_menu.toggle_bots_visible.connect(on_toggle_bots_visible)
 	setup_macro_bar()
 	encounter_menu.toggle_macro_bar.connect(on_toggle_macro_bar)
+	setup_labeling_macro_bar()
+	encounter_menu.toggle_labeling_macros.connect(on_toggle_labeling_macros)
 	p4_anim.play("p4_anim")
 	#p4_anim.play_section("p4_anim", 40.0)
 
@@ -177,6 +186,37 @@ func setup_macro_bar() -> void:
 
 func on_toggle_macro_bar(is_visible: bool) -> void:
 	macro_bar.visible = is_visible
+
+
+# Builds the self-marking bar for the role the player picked. The party is torn
+# down and rebuilt whenever that changes, so the bar only needs building once.
+# One row of 4: the role's marker pair (self-mark), then the Acceleration/
+# Stillness Echo reminders, identical for every role.
+func setup_labeling_macro_bar() -> void:
+	self_mark_key = ""
+	var macros := DmuGlobal.LABEL_MACROS_SUP if player_key in Global.SUP_ROLE_KEYS\
+		else DmuGlobal.LABEL_MACROS_DPS
+	labeling_macro_bar.set_macros(macros, macros.size())
+	labeling_macro_bar.marker_used.connect(on_self_mark)
+	labeling_macro_bar.macro_used.connect(echo_chat_log.add_echo_message)
+	on_toggle_labeling_macros(DmuSavedVariables.get_data_and_check_bool("settings", "p4_labeling_macros"))
+
+
+func on_toggle_labeling_macros(is_visible: bool) -> void:
+	labeling_macro_bar.visible = is_visible
+	echo_chat_log.visible = is_visible
+
+
+# Pressing the marker already worn clears it; pressing the other one swaps,
+# which add_marker() handles by clearing the target first.
+func on_self_mark(marker_key: String) -> void:
+	var player: PlayableCharacter = party[player_key]
+	if marker_key == self_mark_key:
+		target_marker_controller.remove_markers(player)
+		self_mark_key = ""
+		return
+	target_marker_controller.add_marker(marker_key, player)
+	self_mark_key = marker_key
 
 
 func instantiate_party(new_party):

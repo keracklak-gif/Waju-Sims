@@ -23,7 +23,9 @@ const DEFAULT_UI_POSITIONS = {
 	"player_debuffs": [0.576, 0.667],
 	"enmity_cast_bar": [0.174, 0.711],
 	"chat_log": [0.016, 0.62],
-	"macro_bar": [0.463, 0.79]
+	"echo_chat_log": [0.016, 0.40],
+	"macro_bar": [0.463, 0.79],
+	"labeling_macro_bar": [0.463, 0.84]
 }
 const DEFAULT_UI_SCALES = {
 	"action_bar": Vector2(1, 1),
@@ -33,7 +35,9 @@ const DEFAULT_UI_SCALES = {
 	"player_debuffs": Vector2(2, 2),
 	"enmity_cast_bar": Vector2(0.85, 0.85),
 	"chat_log": Vector2(1, 1),
-	"macro_bar": Vector2(1, 1)
+	"echo_chat_log": Vector2(1, 1),
+	"macro_bar": Vector2(1, 1),
+	"labeling_macro_bar": Vector2(1, 1)
 }
 const UI_SCALE_INCREMENT = Vector2(0.05, 0.05)
 
