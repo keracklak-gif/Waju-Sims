@@ -44,6 +44,12 @@ const TSUNAMI_COLOR := Color(0.541, 0.675, 0.76, 0.9)
 const GAZE_MIN_ANGLE := 45.0
 const GAZE_MAX_ANGLE := 315
 
+## Bob Robotson callouts
+# Plain "---" flanking each line collapses into a single "—" ligature at
+# this chat font, so multi-line callouts use this as a standalone divider
+# message instead, framing the block rather than each individual line.
+const CALLOUT_DIVIDER := "----------------------------"
+
 # Position order NW CCW
 const CHAOS_HEROS := ["t1", "h1", "m1", "m2"]
 const EXDEATH_HEROS := ["t2", "h2", "r1", "r2"]
@@ -336,10 +342,13 @@ func cast_gc(gc_num: int):
 		push_error("Invalid index in cast_gc.")
 	enemy_cast_bar.cast("Grand Cross", 8.8)
 	neo_exdeath.show_orbs(neo_fake)
-	if DmuSavedVariables.get_data_and_check_bool("settings", "p4_bobot_callouts") and gc_num <= 2:
-		var ordinal := "1ST" if gc_num == 1 else "2ND"
-		var tell := "FAKE (Look In)" if neo_fake else "REAL (Look Away)"
-		chat_log.add_message("--- %s GAZE %s ---" % [ordinal, tell])
+	if DmuSavedVariables.get_data_and_check_bool("settings", "p4_bobot_callouts") and gc_num == 2:
+		var short_tell := "LOOK IN" if neo_1_fake else "LOOK OUT"
+		var long_tell := "LOOK IN" if neo_2_fake else "LOOK OUT"
+		chat_log.add_message(CALLOUT_DIVIDER)
+		chat_log.add_message("SHORT SHRIEK %s" % short_tell)
+		chat_log.add_message("LONG SHRIEK %s" % long_tell)
+		chat_log.add_message(CALLOUT_DIVIDER)
 	# TODO: GC cast anim
 
 
@@ -374,13 +383,17 @@ func cast_chaos(num: int):
 	if (num == 1 and inferno_first) or (num == 2 and !inferno_first):
 		enemy_cast_bar.cast("Inferno", 8.7)
 		chaos.show_orbs(inferno_fake)
-		if bobot_callouts:
-			chat_log.add_message("--- FIRE IS %s ---" % ("DONUT" if inferno_fake else "TWISTER"))
 	else:
 		enemy_cast_bar.cast("Tsunami", 8.7)
 		chaos.show_orbs(tsunami_fake)
-		if bobot_callouts:
-			chat_log.add_message("--- WATER IS %s ---" % ("TWISTER" if tsunami_fake else "DONUT"))
+	if bobot_callouts and num == 2:
+		# Fire's (Entropy's) donut/twister always resolves before Water's
+		# (Fluid's) - see inferno_hit() at 83.5 vs tsunami_hit() at 107.5,
+		# fixed regardless of inferno_first (which only reorders the earlier
+		# cast telegraphs, not the payoff) - so Fire is always "1ST" here.
+		var inferno_tell := "DONUT" if inferno_fake else "TWISTER"
+		var tsunami_tell := "TWISTER" if tsunami_fake else "DONUT"
+		chat_log.add_message("%s 1ST -> %s 2ND" % [inferno_tell, tsunami_tell])
 
 
 # 12.6 - Assign Neo debuffs 1 (2 Lightning, 2 Water, 4 Accel (2 short/2 long), 2 Shriek)

@@ -13,6 +13,10 @@ const PARTY_CHAT_COLOR := Color(0.55, 0.85, 1.0)
 const ECHO_CHAT_COLOR := Color(0.85, 0.75, 0.95)
 const BOBOT_NAME := "Bob Robotson"
 const PLAYER_NAME := "You"
+## Bob's callouts run noticeably wider than typed chat at the normal 13px
+## font (all-caps, and eurostarregularextended is an expanded-width face),
+## so they get their own smaller size to fit one row instead of wrapping.
+const BOBOT_FONT_SIZE := 10
 
 ## Per-instance so one scene can serve both the party chat log and the Echo
 ## log: the key this window saves its position/scale under (must have entries
@@ -46,7 +50,7 @@ func _ready():
 
 # Appends a line as if a party member ("Bob Robotson") typed it via macro.
 func add_message(text: String) -> void:
-	add_party_message(BOBOT_NAME, text)
+	add_party_message(BOBOT_NAME, text, BOBOT_FONT_SIZE)
 
 
 # Appends a line as if the player typed it via a chat macro.
@@ -54,8 +58,11 @@ func add_player_message(text: String) -> void:
 	add_party_message(PLAYER_NAME, text)
 
 
-func add_party_message(sender: String, text: String) -> void:
-	messages.append_text("[color=#%s][Party] %s: %s[/color]\n" % [PARTY_CHAT_COLOR.to_html(false), sender, text])
+func add_party_message(sender: String, text: String, font_size: int = 0) -> void:
+	var line := "[color=#%s][Party] %s: %s[/color]" % [PARTY_CHAT_COLOR.to_html(false), sender, text]
+	if font_size > 0:
+		line = "[font_size=%d]%s[/font_size]" % [font_size, line]
+	messages.append_text(line + "\n")
 	messages.scroll_to_line(messages.get_line_count())
 
 
