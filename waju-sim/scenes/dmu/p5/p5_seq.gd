@@ -6,7 +6,7 @@
 
 extends Node
 
-enum Strat {KB}
+enum Strat {KB, KEFKABIN}
 enum StartPoint {START, FLOOD, CELEST, EXA, FORS}
 
 
@@ -102,6 +102,7 @@ var inner_b_pos = Vector2(32, 0)
 var is_b_covered := false
 var stack_tar_key: String
 var starting_point: StartPoint
+var strat: Strat
 
 
 func start_sequence(new_party: Dictionary) -> void:
@@ -111,7 +112,7 @@ func start_sequence(new_party: Dictionary) -> void:
 	target_controller.add_targetable_npc(kefka)
 	lockon_controller.pre_load([LockonController.STACK_MARKER])
 	## Get Strat and variables.
-	#strat = DmuSavedVariables.save_data["settings"]["p5_strat"]
+	strat = DmuSavedVariables.get_data_and_check_int("settings", "p5_strat", 0, Strat.size()) as Strat
 	starting_point = DmuSavedVariables.get_data_and_check_int("settings", "p5_start_point", 0, StartPoint.size()) as StartPoint
 	instantiate_party(new_party)
 	on_toggle_bots_visible()
@@ -539,21 +540,26 @@ func move_flood_pos_4():
 		move_party_and_rotate(P5Pos.FLOOD_SE, flood_rotation_deg)
 
 
+func get_mad_pre_pos() -> Dictionary:
+	return P5Pos.MAD_PRE_POS_KEFKABIN if strat == Strat.KEFKABIN else P5Pos.MAD_PRE_POS
+
+
 func move_mad_pre_pos():
-	move_party(P5Pos.MAD_PRE_POS)
+	move_party(get_mad_pre_pos())
 
 
 # After hit 1
 func move_mad_1():
 	# Move tanks
 	move_party(P5Pos.MAD_2_TANK_POS)
+	var mad_pre_pos = get_mad_pre_pos()
 	# Move hits out
 	var hit_keys = mad_keys.slice(0, 3)
 	for key in hit_keys:
-		party[key].move_to(scoot_out(P5Pos.MAD_PRE_POS[key], MAD_SCOOT_DIST))
+		party[key].move_to(scoot_out(mad_pre_pos[key], MAD_SCOOT_DIST))
 	var non_hit_keys = mad_keys.slice(3, 6)
 	for key in non_hit_keys:
-		party[key].move_to(scoot_in(P5Pos.MAD_PRE_POS[key], MAD_SCOOT_DIST))
+		party[key].move_to(scoot_in(mad_pre_pos[key], MAD_SCOOT_DIST))
 
 
 # After hit 2, mt/flare tank out
