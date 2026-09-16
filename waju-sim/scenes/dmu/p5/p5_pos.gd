@@ -64,6 +64,13 @@ const MAD_PRE_POS := {
 	"m1": Vector2(-5, 23), "m2": Vector2(10.84, 20.28), "r1": Vector2(21.25, 8.8), "r2": Vector2(21.25, -8.8),
 }
 
+# Kefkabin strat: healers south (old m1/m2 spots), melee/ranged split
+# west/east (one of each per side) instead of grouped per side.
+const MAD_PRE_POS_KEFKABIN := {
+	"t1": Vector2(-8.8, -21.25), "t2": Vector2(8.8, -21.25), "h1": Vector2(-5, 23), "h2": Vector2(10.84, 20.28),
+	"m1": Vector2(-22.65, -4), "m2": Vector2(21.25, -8.8), "r1": Vector2(21.25, 8.8), "r2": Vector2(-18, 15),
+}
+
 const MAD_2_TANK_POS := {
 	"t1": _MAD_TANK_N + _RS1, "t2": _MAD_TANK_N - _RS1
 }
