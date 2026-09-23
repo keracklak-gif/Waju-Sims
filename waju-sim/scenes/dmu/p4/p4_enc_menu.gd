@@ -9,6 +9,7 @@ extends CanvasLayer
 signal toggle_bots_visible()
 signal toggle_macro_bar(is_visible: bool)
 signal toggle_labeling_macros(is_visible: bool)
+signal toggle_healer_cooldowns(is_visible: bool)
 
 @onready var encounter_config_button: TextureButton = %EncounterConfigButton
 @onready var strat_margin_container: MarginContainer = %StratMarginContainer
@@ -20,6 +21,7 @@ signal toggle_labeling_macros(is_visible: bool)
 @onready var bobot_callouts_button: CheckButton = %BobotCalloutsButton
 @onready var macro_bar_button: CheckButton = %MacroBarButton
 @onready var labeling_macros_button: CheckButton = %LabelingMacrosButton
+@onready var healer_cooldowns_button: CheckButton = %HealerCooldownsButton
 
 
 #@onready var flex_button: CheckButton = %FlexButton
@@ -32,6 +34,7 @@ func _ready() -> void:
 	bobot_callouts_button.button_pressed = DmuSavedVariables.save_data["settings"]["p4_bobot_callouts"]
 	macro_bar_button.button_pressed = DmuSavedVariables.save_data["settings"]["p4_macro_bar"]
 	labeling_macros_button.button_pressed = DmuSavedVariables.save_data["settings"]["p4_labeling_macros"]
+	healer_cooldowns_button.button_pressed = DmuSavedVariables.save_data["settings"]["p4_healer_cooldowns"]
 
 
 func _on_encounter_config_button_pressed() -> void:
@@ -86,3 +89,8 @@ func _on_macro_bar_button_pressed() -> void:
 func _on_labeling_macros_button_pressed() -> void:
 	GameEvents.emit_encounter_variable_saved("settings", "p4_labeling_macros", labeling_macros_button.button_pressed)
 	toggle_labeling_macros.emit(labeling_macros_button.button_pressed)
+
+
+func _on_healer_cooldowns_button_pressed() -> void:
+	GameEvents.emit_encounter_variable_saved("settings", "p4_healer_cooldowns", healer_cooldowns_button.button_pressed)
+	toggle_healer_cooldowns.emit(healer_cooldowns_button.button_pressed)

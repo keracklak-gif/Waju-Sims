@@ -278,6 +278,24 @@ select_all_on_focus = true
 update_on_text_changed = true
 script = ExtResource("10_gcdsb")
 
+[node name="HealerKeysContainer" type="HBoxContainer" parent="KeybindsMenuContainer/ControlMarginContainer/LeftButtonsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="HealerKeysLabel" type="Label" parent="KeybindsMenuContainer/ControlMarginContainer/LeftButtonsVBox/HealerKeysContainer"]
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+text = "Healer Cooldowns"
+label_settings = SubResource("LabelSettings_iqfvl")
+
+[node name="HealerKeysButton" type="Button" parent="KeybindsMenuContainer/ControlMarginContainer/LeftButtonsVBox/HealerKeysContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_font_sizes/font_size = 18
+text = "Edit Keys"
+
 [node name="MouseSensContainer" type="HBoxContainer" parent="KeybindsMenuContainer/ControlMarginContainer/LeftButtonsVBox" unique_id=697718205]
 layout_mode = 2
 theme_override_constants/separation = 6
@@ -723,6 +741,7 @@ text = "Back"
 [connection signal="pressed" from="KeybindsMenuContainer/ControlMarginContainer/LeftButtonsVBox/DashContainer/DashKeyButton" to="." method="_on_dash_key_button_pressed"]
 [connection signal="pressed" from="KeybindsMenuContainer/ControlMarginContainer/LeftButtonsVBox/CastContainer/CastKeyButton" to="." method="_on_cast_key_button_pressed"]
 [connection signal="value_changed" from="KeybindsMenuContainer/ControlMarginContainer/LeftButtonsVBox/CastGcdContainer/CastGcdSpinBox" to="KeybindsMenuContainer/ControlMarginContainer/LeftButtonsVBox/CastGcdContainer/CastGcdSpinBox" method="_on_value_changed"]
+[connection signal="pressed" from="KeybindsMenuContainer/ControlMarginContainer/LeftButtonsVBox/HealerKeysContainer/HealerKeysButton" to="." method="_on_healer_keys_button_pressed"]
 [connection signal="drag_ended" from="KeybindsMenuContainer/ControlMarginContainer/LeftButtonsVBox/MouseSensContainer/MouseSensHSlider" to="." method="_on_mouse_sens_h_slider_drag_ended"]
 [connection signal="drag_ended" from="KeybindsMenuContainer/ControlMarginContainer/LeftButtonsVBox/XSensContainer/XSensHSlider" to="." method="_on_x_sens_h_slider_drag_ended"]
 [connection signal="drag_ended" from="KeybindsMenuContainer/ControlMarginContainer/LeftButtonsVBox/YSensContainer2/YSensHSlider" to="." method="_on_y_sens_h_slider_drag_ended"]
