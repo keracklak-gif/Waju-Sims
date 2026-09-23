@@ -8,10 +8,12 @@ extends MovableCanvasLayer
 @onready var sprint_action_button: ActionButton = $MarginContainer/ButtonsContainer/SprintActionButton
 @onready var arms_action_button: ActionButton = $MarginContainer/ButtonsContainer/ArmsActionButton
 @onready var dash_action_button: ActionButton = $MarginContainer/ButtonsContainer/DashActionButton
-@onready var cast_action_button: ActionButton = $MarginContainer/ButtonsContainer/CastActionButton
-@onready var dot_action_button: ActionButton = $MarginContainer/ButtonsContainer/DotActionButton
+@onready var cast_action_button: HealerAbilityButton = $MarginContainer/ButtonsContainer/CastActionButton
+@onready var dot_action_button: HealerAbilityButton = $MarginContainer/ButtonsContainer/DotActionButton
 @onready var player_cast_bar: PlayerCastBar = $PlayerCastBar
 @onready var target_debuff_bar: TargetDebuffBar = $TargetDebuffBar
+@onready var healer_ability_bar: HealerAbilityBar = $HealerAbilityBar
+@onready var healer_buff_bar: HealerBuffBar = $HealerBuffBar
 @onready var parent_node = $".."
 @onready var control_menu: CanvasLayer = %ControlMenu
 @onready var move_ui_bg: Panel = %MoveUIBG
@@ -19,7 +21,6 @@ extends MovableCanvasLayer
 
 var player: Player
 var keybinds: Dictionary
-var eukrasia_active := false  # Sage: Eukrasia used, next DoT press is Eukrasian Dosis.
 
 
 func _ready() -> void:
@@ -58,9 +59,13 @@ func _unhandled_input(event : InputEvent) -> void:
 		elif keycode == keybinds["ab3_dash"]:
 			dash_action_button._on_pressed()
 		elif keycode == keybinds["ab5_cast"] and cast_action_button.visible:
-			cast_action_button._on_pressed()
+			if event.is_pressed() and not event.is_echo():
+				cast_action_button._on_pressed()
 		elif keycode == keybinds["ab6_dot"] and dot_action_button.visible:
-			dot_action_button._on_pressed()
+			if event.is_pressed() and not event.is_echo():
+				dot_action_button._on_pressed()
+		elif event.is_pressed() and not event.is_echo() and healer_ability_bar.handle_key(keycode):
+			pass
 		elif keycode == keybinds["reset"]:
 			if Input.is_action_just_pressed("reset"):  # Needed to stop ghost input from hanging after reset.
 				parent_node._on_reset_button_pressed()
@@ -80,34 +85,73 @@ func _unhandled_input(event : InputEvent) -> void:
 
 func on_party_ready() -> void:
 	player = get_tree().get_first_node_in_group("player")
-	cast_action_button.visible = Global.HEALER_JOBS.has(Global.player_role_key)
-	if cast_action_button.visible:
+	var is_healer: bool = Global.HEALER_JOBS.has(Global.player_role_key)
+	cast_action_button.visible = is_healer
+	dot_action_button.visible = is_healer
+	target_debuff_bar.visible = is_healer
+	if is_healer:
 		var job: Dictionary = get_current_healer_job()
-		var icon: Texture2D = load(job["icon"])
-		cast_action_button.texture_normal = icon
+		var dot_abilities := make_dot_abilities(job)
+		cast_action_button.texture_normal = load(job["icon"])
 		cast_action_button.texture_hover = load(job["icon_hl"])
-		cast_action_button.cooldown_sweep.texture_progress = icon
+		var filler := {"id": "filler", "name": job["spell_name"], "gcd": true,
+			"cast_time": job["cast_time"], "job_name": job["job_name"]}
+		# Like in game, Eukrasia turns Dosis itself into Eukrasian Dosis.
+		if dot_abilities["button"].has("follow_up"):
+			filler["follow_up"] = dot_abilities["dot"]
+			cast_action_button.texture_hover = null
+		healer_ability_bar.setup(player, player_cast_bar, filler, cast_action_button, healer_buff_bar)
+		healer_ability_bar.controller.register(dot_abilities["dot"])
+		healer_ability_bar.controller.register(dot_abilities["button"])
+		dot_action_button.texture_normal = load(HealerAbilities.icon_path(dot_abilities["button"]))
+		dot_action_button.texture_hover = null
+		dot_action_button.setup(dot_abilities["button"], healer_ability_bar.controller)
+		healer_ability_bar.controller.ability_executed.connect(on_ability_executed)
 		update_cast_gcd()
-		player.player_movement_controller.cast_interrupted.connect(on_cast_interrupted)
-		dot_action_button.show()
-		target_debuff_bar.show()
-		update_dot_button()
+
+
+## The job's DoT as instant GCD abilities for HealerActionController. "button"
+## is what the DoT button holds: the DoT itself, or for Sage, Eukrasia with
+## the DoT as its follow-up (same "eukrasia" status as the cooldown bar's
+## Eukrasia, so either one unlocks Eukrasian Dosis and Eukrasian Prognosis).
+func make_dot_abilities(job: Dictionary) -> Dictionary:
+	var dot_data: Dictionary = job["dot"]
+	var dot := {"id": "dot", "name": dot_data["spell_name"], "gcd": true,
+		"icon": dot_data["icon"], "debuff": dot_data["duration"]}
+	if not dot_data.get("needs_eukrasia", false):
+		return {"dot": dot, "button": dot}
+	dot["requires"] = "eukrasia"
+	dot["consumes"] = true
+	var eukrasia: Dictionary = HealerAbilities.for_job(job["job_name"]).filter(
+		func(ability: Dictionary): return ability["id"] == "eukrasia")[0].duplicate()
+	eukrasia["follow_up"] = dot
+	return {"dot": dot, "button": eukrasia}
+
+
+## Shows or hides healer casting practice: the filler cast button and the
+## healer cooldown bar together. Phases that never call this keep the filler
+## button on for healers and the cooldown bar off.
+func set_healer_cooldowns_visible(is_visible: bool) -> void:
+	var shown := is_visible and Global.HEALER_JOBS.has(Global.player_role_key)
+	cast_action_button.visible = shown
+	dot_action_button.visible = shown
+	target_debuff_bar.visible = shown
+	healer_ability_bar.set_bar_visible(shown)
 
 
 func on_variable_saved(section: String, key: String, _value: Variant) -> void:
-	if section == "settings" and cast_action_button.visible \
+	if section == "settings" and Global.HEALER_JOBS.has(Global.player_role_key) \
 		and key == Global.get_cast_gcd_setting_key(Global.player_role_key, get_current_healer_job_index()):
 		update_cast_gcd()
 
 
-# Keeps the button's own GCD lockout duration in sync with the current
-# job's configured GCD. Doesn't touch a cooldown that's already counting down.
+# Scales every healer GCD (recast and cast time) to the current job's
+# configured GCD, like Skill/Spell Speed. Doesn't touch a GCD already rolling.
 func update_cast_gcd() -> void:
-	if not cast_action_button.visible:
+	if not Global.HEALER_JOBS.has(Global.player_role_key):
 		return
-	cast_action_button.cooldown = Global.get_cast_gcd(Global.player_role_key, get_current_healer_job_index())
-	if cast_action_button.cooldown_timer.is_stopped():
-		cast_action_button.cooldown_timer.wait_time = cast_action_button.cooldown
+	healer_ability_bar.controller.gcd_scale = Global.get_cast_gcd(
+		Global.player_role_key, get_current_healer_job_index()) / Global.BASE_GCD
 
 
 func get_current_healer_job_index() -> int:
@@ -165,69 +209,17 @@ func on_cast_pressed() -> void:
 		if !player:
 			print("Tried to cast, but Player node could not be found.")
 			return
-	# Like in game, Eukrasia also turns Dosis itself into Eukrasian Dosis.
-	if eukrasia_active:
-		apply_dot()
-		return
-	var job: Dictionary = get_current_healer_job()
-	var cast_time: float = Global.get_scaled_cast_time(
-		job["cast_time"], Global.player_role_key, get_current_healer_job_index())
-	player.start_cast(cast_time)
-	player_cast_bar.cast(job["spell_name"], cast_time)
-	start_gcd(cast_action_button.cooldown)
+	healer_ability_bar.use(cast_action_button.current_ability())
 
 
-# Instant DoT on the boss. Sage has to use Eukrasia first, which has its own
-# short GCD and turns this button into Eukrasian Dosis III.
 func on_dot_pressed() -> void:
-	var dot: Dictionary = get_current_healer_job()["dot"]
-	if dot.has("eukrasia") and not eukrasia_active:
-		eukrasia_active = true
-		update_dot_button()
-		start_gcd(dot["eukrasia"]["gcd"])
-		return
-	apply_dot()
+	healer_ability_bar.use(dot_action_button.current_ability())
 
 
-func apply_dot() -> void:
-	var dot: Dictionary = get_current_healer_job()["dot"]
-	eukrasia_active = false
-	update_dot_button()
-	target_debuff_bar.apply(dot["spell_name"], load_icon(dot["icon"]), dot["duration"])
-	start_gcd(cast_action_button.cooldown)
-
-
-## Cast and DoT share one GCD: using either locks both for the same time.
-func start_gcd(duration: float) -> void:
-	cast_action_button.start_cooldown(duration)
-	dot_action_button.start_cooldown(duration)
-
-
-# Shows the DoT, or Eukrasia for Sage until it's been used.
-func update_dot_button() -> void:
-	var dot: Dictionary = get_current_healer_job()["dot"]
-	var shown: Dictionary = dot["eukrasia"] if dot.has("eukrasia") and not eukrasia_active else dot
-	var icon := load_icon(shown["icon"])
-	dot_action_button.texture_normal = icon
-	dot_action_button.texture_hover = load_icon(shown["icon_hl"])
-	dot_action_button.cooldown_sweep.texture_progress = icon
-	dot_action_button.tooltip_text = shown["spell_name"]
-
-
-# DoT icons aren't in every asset pack yet - fall back to the filler spell's
-# icon so the button still works without them.
-func load_icon(path: String) -> Texture2D:
-	if ResourceLoader.exists(path):
-		return load(path)
-	return load(get_current_healer_job()["icon"])
-
-
-# Player moved before the slidecast window - the cast never went off, so
-# there's no GCD to recover from. Clear the bar and free the buttons right away.
-func on_cast_interrupted() -> void:
-	player_cast_bar.clear_casts()
-	cast_action_button.clear_cooldown()
-	dot_action_button.clear_cooldown()
+# Tracking only: a DoT going off just (re)starts its timer on the debuff bar.
+func on_ability_executed(ability: Dictionary) -> void:
+	if ability.has("debuff"):
+		target_debuff_bar.apply(ability["name"], load(HealerAbilities.icon_path(ability)), ability["debuff"])
 
 
 func _on_margin_container_gui_input(event: InputEvent) -> void:

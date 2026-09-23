@@ -15,8 +15,6 @@ signal action_pressed()
 @onready var cooldown_label: Label = %CooldownLabel
 @onready var keybind_label: Label = %KeybindLabel
 
-var active_cooldown := cooldown  # Length of the cooldown currently counting down.
-
 
 func _ready() -> void:
 	cooldown_timer.wait_time = cooldown
@@ -28,7 +26,7 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	cooldown_label.text = "%3.f" %  (int(cooldown_timer.time_left) + 1)
-	cooldown_sweep.value = int((cooldown_timer.time_left / active_cooldown) * 100)
+	cooldown_sweep.value = int((cooldown_timer.time_left / cooldown) * 100)
 
 
 func set_keybind_label(key: String) -> void:
@@ -40,23 +38,11 @@ func _on_pressed() -> void:
 	if disabled or get_tree().get_first_node_in_group("player").is_player_frozen()\
 		or Global.spectate_mode or Global.is_moving_ui:
 		return
-	start_cooldown(cooldown)
-	action_pressed.emit()
-
-
-## Starts (or restarts) the cooldown without firing the action, e.g. for a
-## GCD shared with another button.
-func start_cooldown(duration: float) -> void:
-	active_cooldown = duration
 	disabled = true
 	set_process(true)
-	cooldown_timer.start(duration)
+	cooldown_timer.start()
 	cooldown_label.show()
-
-
-func clear_cooldown() -> void:
-	cooldown_timer.stop()
-	_on_cooldown_timer_timeout()
+	action_pressed.emit()
 
 
 func _on_cooldown_timer_timeout() -> void:

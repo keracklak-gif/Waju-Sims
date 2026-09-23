@@ -24,9 +24,9 @@ script = ExtResource("1_tdbuf")
 [node name="MarginContainer" type="MarginContainer" parent="."]
 anchors_preset = -1
 anchor_left = 0.463
-anchor_top = 0.6
+anchor_top = 0.47
 anchor_right = 0.463
-anchor_bottom = 0.6
+anchor_bottom = 0.47
 offset_right = 200.0
 offset_bottom = 50.0
 grow_horizontal = 2

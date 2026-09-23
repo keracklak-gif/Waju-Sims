@@ -53,14 +53,12 @@ const HEALER_JOBS := {
 		{"job_name": "Sage", "spell_name": "Dosis", "cast_time": 1.5,
 			"icon": "res://assets/common/icons/action_icons/dosis_icon.png",
 			"icon_hl": "res://assets/common/icons/action_icons/dosis_hl_icon.png",
-			# Sage's DoT needs Eukrasia first: Eukrasia (instant, own short GCD)
-			# turns the DoT button into Eukrasian Dosis III.
+			# Sage's DoT needs Eukrasia first, which turns both Dosis and the DoT
+			# button into Eukrasian Dosis III (see ActionBar.make_dot_abilities()).
 			"dot": {"spell_name": "Eukrasian Dosis III", "duration": 30.0,
 				"icon": "res://assets/common/icons/action_icons/eukrasian_dosis_iii_icon.png",
 				"icon_hl": "res://assets/common/icons/action_icons/eukrasian_dosis_iii_hl_icon.png",
-				"eukrasia": {"spell_name": "Eukrasia", "gcd": 1.0,
-					"icon": "res://assets/common/icons/action_icons/healer/eukrasia_icon.png",
-					"icon_hl": "res://assets/common/icons/action_icons/healer/eukrasia_icon.png"}}},
+				"needs_eukrasia": true}},
 	],
 }
 const HEALER_JOB_SETTING_KEYS := {"h1": "healer1_job", "h2": "healer2_job"}

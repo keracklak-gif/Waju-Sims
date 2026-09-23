@@ -25,11 +25,13 @@ const PRESS_KEY_TEXT = "Press Key"
 @onready var invert_y_check_button: CheckButton = %InvertYCheckButton
 @onready var party_order_margin_container: PartyOrderMenu = %PartyOrderMarginContainer
 @onready var control_margin_container: MarginContainer = %ControlMarginContainer
+@onready var keybinds_menu_container: MarginContainer = %KeybindsMenuContainer
 
 var awaited_key: Variant
 var saved_var_keys := ["ab1_sprint", "ab2_arms", "ab3_dash", "ab5_cast", "reset", "move_ui", "ab6_dot"]
 var awaiting_ui := false
 var encounter_menu: CanvasLayer
+var healer_keys_page: MarginContainer
 
 
 func _ready() -> void:
@@ -48,6 +50,8 @@ func _ready() -> void:
 	x_sens_h_slider.set_value_no_signal(SavedVariables.save_data["settings"]["x_sens"])
 	y_sens_h_slider.set_value_no_signal(SavedVariables.save_data["settings"]["y_sens"])
 	invert_y_check_button.set_pressed_no_signal(SavedVariables.save_data["settings"]["invert_y"])
+	build_healer_keys_page()
+	visibility_changed.connect(close_healer_keys_page)
 
 
 func _unhandled_input(event : InputEvent) -> void:
@@ -122,6 +126,70 @@ func _on_reset_key_button_pressed() -> void:
 		return
 	awaited_key = RESET
 	reset_key_button.set_text(PRESS_KEY_TEXT)
+
+
+# Healer cooldown slot keybinds live on their own page, since the Controls page
+# is full. Built from the Controls page's own header, Cast row and Back button
+# so it matches their style. Each slot is appended to buttons/saved_var_keys,
+# so the shared rebind handling in _unhandled_input() covers them.
+func build_healer_keys_page() -> void:
+	var controls_vbox: VBoxContainer = control_margin_container.get_node("LeftButtonsVBox")
+	healer_keys_page = MarginContainer.new()
+	healer_keys_page.custom_minimum_size = control_margin_container.custom_minimum_size
+	for side in ["left", "top", "right", "bottom"]:
+		healer_keys_page.add_theme_constant_override("margin_" + side,
+			control_margin_container.get_theme_constant("margin_" + side))
+	healer_keys_page.hide()
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", controls_vbox.get_theme_constant("separation"))
+	var header: Label = controls_vbox.get_node("HeaderLabel").duplicate(0)
+	header.text = "Healer Cooldowns"
+	vbox.add_child(header)
+	for i in HealerAbilityBar.SLOT_KEYBINDS.size():
+		var saved_key: String = HealerAbilityBar.SLOT_KEYBINDS[i]
+		var row: HBoxContainer = controls_vbox.get_node("CastContainer").duplicate(0)
+		var label: Label = row.get_child(0)
+		label.text = "Cooldown Slot %d" % (i + 1)
+		var button: Button = row.get_child(1)
+		button.unique_name_in_owner = false
+		button.text = OS.get_keycode_string(SavedVariables.save_data["keybinds"][saved_key])
+		button.pressed.connect(_on_keybind_button_pressed.bind(buttons.size(), button))
+		buttons.append(button)
+		saved_var_keys.append(saved_key)
+		vbox.add_child(row)
+	var back_button: Button = controls_vbox.get_node("BottomHBoxContainer/BackButton").duplicate(0)
+	back_button.text = "Back"
+	back_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	back_button.size_flags_vertical = Control.SIZE_EXPAND | Control.SIZE_SHRINK_END
+	back_button.pressed.connect(close_healer_keys_page)
+	vbox.add_child(back_button)
+	healer_keys_page.add_child(vbox)
+	keybinds_menu_container.add_child(healer_keys_page)
+
+
+func _on_keybind_button_pressed(index: int, button: Button) -> void:
+	if awaited_key != null:
+		return
+	awaited_key = index
+	button.set_text(PRESS_KEY_TEXT)
+
+
+func _on_healer_keys_button_pressed() -> void:
+	control_margin_container.hide()
+	healer_keys_page.show()
+
+
+# Also runs when the menu is closed, so it reopens on the Controls page.
+func close_healer_keys_page() -> void:
+	if not healer_keys_page.visible:
+		return
+	awaited_key = null
+	# Undo a "Press Key" left on a slot whose rebind was abandoned.
+	for index in saved_var_keys.size():
+		if saved_var_keys[index] in HealerAbilityBar.SLOT_KEYBINDS:
+			buttons[index].set_text(OS.get_keycode_string(SavedVariables.save_data["keybinds"][saved_var_keys[index]]))
+	healer_keys_page.hide()
+	control_margin_container.show()
 
 
 func _on_mouse_sens_h_slider_drag_ended(value_changed: bool) -> void:
