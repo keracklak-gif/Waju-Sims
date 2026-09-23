@@ -47,8 +47,35 @@ const HEALER_JOBS := {
 	],
 }
 const HEALER_JOB_SETTING_KEYS := {"h1": "healer1_job", "h2": "healer2_job"}
-const CAST_GCD := 2.5  # Seconds the cast button is locked out for after a completed cast.
-const SLIDECAST_WINDOW := 0.5  # Moving in the last N seconds of a cast no longer interrupts it.
+## Job cast_time values above are balanced at this baseline (0% Skill/Spell
+## Speed) GCD; each job has its own configurable GCD (Skill/Spell Speed
+## varies by job/build) saved as "cast_gcd_<role_key>_<job_index>".
+## get_cast_gcd()/get_scaled_cast_time() scale cast_time to it, same as
+## Skill/Spell Speed does in the real game.
+const BASE_GCD := 2.5
+const MIN_GCD := 2.0
+const MAX_GCD := 2.5
+const SLIDECAST_WINDOW := 0.5  # Moving in the last N seconds of a cast no longer interrupts it. Fixed regardless of GCD - it's a latency buffer, not a game formula.
+
+
+func get_selected_role_key() -> String:
+	return ROLE_KEYS[SavedVariables.save_data["settings"]["player_role"]]
+
+
+func get_selected_healer_job_index(role_key: String) -> int:
+	return SavedVariables.save_data["settings"][HEALER_JOB_SETTING_KEYS[role_key]]
+
+
+func get_cast_gcd_setting_key(role_key: String, job_index: int) -> String:
+	return "cast_gcd_%s_%d" % [role_key, job_index]
+
+
+func get_cast_gcd(role_key: String, job_index: int) -> float:
+	return SavedVariables.save_data["settings"][get_cast_gcd_setting_key(role_key, job_index)]
+
+
+func get_scaled_cast_time(base_cast_time: float, role_key: String, job_index: int) -> float:
+	return base_cast_time * (get_cast_gcd(role_key, job_index) / BASE_GCD)
 
 const ROLE_NAMES = {"t1": TANKS[0], "t2": TANKS[1],
 	"h1": HEALERS[0], "h2": HEALERS[1],

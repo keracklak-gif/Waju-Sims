@@ -36,6 +36,7 @@ func _ready() -> void:
 	dash_action_button.action_pressed.connect(on_dash_pressed)
 	cast_action_button.action_pressed.connect(on_cast_pressed)
 	cast_action_button.hide()
+	GameEvents.variable_saved.connect(on_variable_saved)
 	SavedVariables.keybind_changed.connect(on_keybind_changed)
 	keybinds = SavedVariables.get_keybinds()
 	update_keybinds()
@@ -85,6 +86,7 @@ func on_party_ready() -> void:
 		var filler := {"id": "filler", "name": job["spell_name"], "gcd": true,
 			"cast_time": job["cast_time"], "job_name": job["job_name"]}
 		healer_ability_bar.setup(player, player_cast_bar, filler, cast_action_button, healer_buff_bar)
+		update_cast_gcd()
 
 
 ## Shows or hides healer casting practice: the filler cast button and the
@@ -96,9 +98,28 @@ func set_healer_cooldowns_visible(is_visible: bool) -> void:
 	healer_ability_bar.set_bar_visible(shown)
 
 
-func get_current_healer_job() -> Dictionary:
+func on_variable_saved(section: String, key: String, _value: Variant) -> void:
+	if section == "settings" and Global.HEALER_JOBS.has(Global.player_role_key) \
+		and key == Global.get_cast_gcd_setting_key(Global.player_role_key, get_current_healer_job_index()):
+		update_cast_gcd()
+
+
+# Scales every healer GCD (recast and cast time) to the current job's
+# configured GCD, like Skill/Spell Speed. Doesn't touch a GCD already rolling.
+func update_cast_gcd() -> void:
+	if not Global.HEALER_JOBS.has(Global.player_role_key):
+		return
+	healer_ability_bar.controller.gcd_scale = Global.get_cast_gcd(
+		Global.player_role_key, get_current_healer_job_index()) / Global.BASE_GCD
+
+
+func get_current_healer_job_index() -> int:
 	var setting_key: String = Global.HEALER_JOB_SETTING_KEYS[Global.player_role_key]
-	return Global.HEALER_JOBS[Global.player_role_key][SavedVariables.save_data["settings"][setting_key]]
+	return SavedVariables.save_data["settings"][setting_key]
+
+
+func get_current_healer_job() -> Dictionary:
+	return Global.HEALER_JOBS[Global.player_role_key][get_current_healer_job_index()]
 
 
 func on_keybind_changed(new_keybinds: Dictionary) -> void:

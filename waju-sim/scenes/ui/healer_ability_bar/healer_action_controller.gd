@@ -8,7 +8,8 @@
 ##
 ## Rules modelled:
 ## - GCD actions share one recast (2.5s, or the action's own "gcd_recast"),
-##   started the moment the action is pressed, cast time included.
+##   started the moment the action is pressed, cast time included. The
+##   recast and cast times both scale by gcd_scale (Skill/Spell Speed).
 ## - Nothing can be used mid-cast. A completed cast leaves a short caster tax
 ##   lock, after which oGCDs can be woven until the next GCD.
 ## - Every instant action (oGCD or instant GCD) applies an animation lock that
@@ -38,6 +39,7 @@ const QUEUE_WINDOW := 0.5
 
 var gcd_left := 0.0
 var gcd_total := GCD
+var gcd_scale := 1.0  # Job's configured GCD / 2.5, set by ActionBar.
 var cast_left := 0.0
 var casting_ability: Dictionary = {}
 var lock_left := 0.0
@@ -127,11 +129,11 @@ func execute(ability: Dictionary) -> void:
 			recast_left[id] = ability["recast"]
 		charges[id] -= 1
 	if ability.get("gcd", false):
-		gcd_total = ability.get("gcd_recast", GCD)
+		gcd_total = ability.get("gcd_recast", GCD) * gcd_scale
 		gcd_left = gcd_total
 	if ability.get("cast_time", 0.0) > 0.0:
 		casting_ability = ability
-		cast_left = ability["cast_time"]
+		cast_left = ability["cast_time"] * gcd_scale
 		cast_started.emit(ability)
 	else:
 		lock_left = ANIMATION_LOCK

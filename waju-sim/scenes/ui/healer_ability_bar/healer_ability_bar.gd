@@ -117,9 +117,9 @@ func use(ability: Dictionary) -> void:
 
 
 func on_cast_started(ability: Dictionary) -> void:
-	player.start_cast(ability["cast_time"])
+	player.start_cast(controller.cast_left)
 	player_cast_bar.clear_casts()
-	player_cast_bar.cast(ability["name"], ability["cast_time"])
+	player_cast_bar.cast(ability["name"], controller.cast_left)
 
 
 func on_cast_interrupted() -> void:
