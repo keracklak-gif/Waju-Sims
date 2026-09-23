@@ -34,6 +34,7 @@ func _ready() -> void:
 	dash_action_button.action_pressed.connect(on_dash_pressed)
 	cast_action_button.action_pressed.connect(on_cast_pressed)
 	cast_action_button.hide()
+	GameEvents.variable_saved.connect(on_variable_saved)
 	SavedVariables.keybind_changed.connect(on_keybind_changed)
 	keybinds = SavedVariables.get_keybinds()
 	update_keybinds()
@@ -79,12 +80,33 @@ func on_party_ready() -> void:
 		cast_action_button.texture_normal = icon
 		cast_action_button.texture_hover = load(job["icon_hl"])
 		cast_action_button.cooldown_sweep.texture_progress = icon
+		update_cast_gcd()
 		player.player_movement_controller.cast_interrupted.connect(on_cast_interrupted)
 
 
-func get_current_healer_job() -> Dictionary:
+func on_variable_saved(section: String, key: String, _value: Variant) -> void:
+	if section == "settings" and cast_action_button.visible \
+		and key == Global.get_cast_gcd_setting_key(Global.player_role_key, get_current_healer_job_index()):
+		update_cast_gcd()
+
+
+# Keeps the button's own GCD lockout duration in sync with the current
+# job's configured GCD. Doesn't touch a cooldown that's already counting down.
+func update_cast_gcd() -> void:
+	if not cast_action_button.visible:
+		return
+	cast_action_button.cooldown = Global.get_cast_gcd(Global.player_role_key, get_current_healer_job_index())
+	if cast_action_button.cooldown_timer.is_stopped():
+		cast_action_button.cooldown_timer.wait_time = cast_action_button.cooldown
+
+
+func get_current_healer_job_index() -> int:
 	var setting_key: String = Global.HEALER_JOB_SETTING_KEYS[Global.player_role_key]
-	return Global.HEALER_JOBS[Global.player_role_key][SavedVariables.save_data["settings"][setting_key]]
+	return SavedVariables.save_data["settings"][setting_key]
+
+
+func get_current_healer_job() -> Dictionary:
+	return Global.HEALER_JOBS[Global.player_role_key][get_current_healer_job_index()]
 
 
 func on_keybind_changed(new_keybinds: Dictionary) -> void:
@@ -133,8 +155,10 @@ func on_cast_pressed() -> void:
 			print("Tried to cast, but Player node could not be found.")
 			return
 	var job: Dictionary = get_current_healer_job()
-	player.start_cast(job["cast_time"])
-	player_cast_bar.cast(job["spell_name"], job["cast_time"])
+	var cast_time: float = Global.get_scaled_cast_time(
+		job["cast_time"], Global.player_role_key, get_current_healer_job_index())
+	player.start_cast(cast_time)
+	player_cast_bar.cast(job["spell_name"], cast_time)
 
 
 # Player moved before the slidecast window - the cast never went off, so

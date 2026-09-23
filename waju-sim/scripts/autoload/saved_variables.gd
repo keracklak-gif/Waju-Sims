@@ -18,6 +18,10 @@ var save_data: Dictionary = {
 		"player_role": 0,
 		"healer1_job": 0,
 		"healer2_job": 0,
+		"cast_gcd_h1_0": 2.41,  # White Mage
+		"cast_gcd_h1_1": 2.40,  # Astrologian
+		"cast_gcd_h2_0": 2.40,  # Scholar
+		"cast_gcd_h2_1": 2.39,  # Sage
 		"screen_res": Vector2i(1600, 900),
 		"screen_pos": null,
 		"maximized": false,
