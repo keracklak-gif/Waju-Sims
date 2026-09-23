@@ -7,7 +7,7 @@
 
 extends CanvasLayer
 
-enum {SPRINT, ARMS, DASH, RESET, MOVE_UI}
+enum {SPRINT, ARMS, DASH, CAST, RESET, MOVE_UI}
 
 const PRESS_KEY_TEXT = "Press Key"
 
@@ -15,8 +15,9 @@ const PRESS_KEY_TEXT = "Press Key"
 @onready var sprint_key_button: Button = %SprintKeyButton
 @onready var arms_key_button: Button = %ArmsKeyButton
 @onready var dash_key_button: Button = %DashKeyButton
+@onready var cast_key_button: Button = %CastKeyButton
 @onready var reset_key_button: Button = %ResetKeyButton
-@onready var buttons := [%SprintKeyButton, %ArmsKeyButton, %DashKeyButton, %ResetKeyButton, %MoveUIKeyButton]
+@onready var buttons := [%SprintKeyButton, %ArmsKeyButton, %DashKeyButton, %CastKeyButton, %ResetKeyButton, %MoveUIKeyButton]
 @onready var mouse_sens_h_slider: HSlider = %MouseSensHSlider
 @onready var x_sens_h_slider: HSlider = %XSensHSlider
 @onready var y_sens_h_slider: HSlider = %YSensHSlider
@@ -25,7 +26,7 @@ const PRESS_KEY_TEXT = "Press Key"
 @onready var control_margin_container: MarginContainer = %ControlMarginContainer
 
 var awaited_key: Variant
-var saved_var_keys := ["ab1_sprint", "ab2_arms", "ab3_dash", "reset", "move_ui"]
+var saved_var_keys := ["ab1_sprint", "ab2_arms", "ab3_dash", "ab5_cast", "reset", "move_ui"]
 var awaiting_ui := false
 var encounter_menu: CanvasLayer
 
@@ -38,6 +39,7 @@ func _ready() -> void:
 	sprint_key_button.set_text(OS.get_keycode_string(SavedVariables.save_data["keybinds"]["ab1_sprint"]))
 	arms_key_button.set_text(OS.get_keycode_string(SavedVariables.save_data["keybinds"]["ab2_arms"]))
 	dash_key_button.set_text(OS.get_keycode_string(SavedVariables.save_data["keybinds"]["ab3_dash"]))
+	cast_key_button.set_text(OS.get_keycode_string(SavedVariables.save_data["keybinds"]["ab5_cast"]))
 	reset_key_button.set_text(OS.get_keycode_string(SavedVariables.save_data["keybinds"]["reset"]))
 	# Set sliders
 	mouse_sens_h_slider.set_value_no_signal(SavedVariables.save_data["settings"]["mouse_sens"])
@@ -97,6 +99,13 @@ func _on_dash_key_button_pressed() -> void:
 		return
 	awaited_key = DASH
 	dash_key_button.set_text(PRESS_KEY_TEXT)
+
+
+func _on_cast_key_button_pressed() -> void:
+	if awaited_key != null:
+		return
+	awaited_key = CAST
+	cast_key_button.set_text(PRESS_KEY_TEXT)
 
 
 func _on_reset_key_button_pressed() -> void:

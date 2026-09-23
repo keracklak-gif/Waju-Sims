@@ -27,6 +27,29 @@ const TANK_ROLE_KEYS = ["t1", "t2"]
 const HEALER_ROLE_KEYS = ["h1", "h2"]
 const MELEE_ROLE_KEYS = ["m1", "m2"]
 const RANGED_ROLE_KEYS = ["r1", "r2"]
+## Healer job select. Index matches each role's HealerJobSelectButton items.
+const HEALER_JOBS := {
+	"h1": [
+		{"job_name": "White Mage", "spell_name": "Glare", "cast_time": 1.5,
+			"icon": "res://assets/common/icons/action_icons/glare_icon.png",
+			"icon_hl": "res://assets/common/icons/action_icons/glare_hl_icon.png"},
+		{"job_name": "Astrologian", "spell_name": "Malefic", "cast_time": 1.5,
+			"icon": "res://assets/common/icons/action_icons/malefic_icon.png",
+			"icon_hl": "res://assets/common/icons/action_icons/malefic_hl_icon.png"},
+	],
+	"h2": [
+		{"job_name": "Scholar", "spell_name": "Broil", "cast_time": 1.5,
+			"icon": "res://assets/common/icons/action_icons/broil_icon.png",
+			"icon_hl": "res://assets/common/icons/action_icons/broil_hl_icon.png"},
+		{"job_name": "Sage", "spell_name": "Dosis", "cast_time": 1.5,
+			"icon": "res://assets/common/icons/action_icons/dosis_icon.png",
+			"icon_hl": "res://assets/common/icons/action_icons/dosis_hl_icon.png"},
+	],
+}
+const HEALER_JOB_SETTING_KEYS := {"h1": "healer1_job", "h2": "healer2_job"}
+const CAST_GCD := 2.5  # Seconds the cast button is locked out for after a completed cast.
+const SLIDECAST_WINDOW := 0.5  # Moving in the last N seconds of a cast no longer interrupts it.
+
 const ROLE_NAMES = {"t1": TANKS[0], "t2": TANKS[1],
 	"h1": HEALERS[0], "h2": HEALERS[1],
 	"m1": MELEE[0], "m2": MELEE[1],

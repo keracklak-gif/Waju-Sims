@@ -18,6 +18,7 @@ const DEFAULT_UI_POSITIONS = {
 	#"enmity_cast_bar": Vector2(195, 483)
 	"action_bar": [0.463, 0.716],
 	"cast_bar": [0.226, 0.654],
+	"player_cast_bar": [0.463, 0.66],
 	"fail_list": [0.028, 0.201],
 	"party_list": [0.706, 0.279],
 	"player_debuffs": [0.576, 0.667],
@@ -30,6 +31,7 @@ const DEFAULT_UI_POSITIONS = {
 const DEFAULT_UI_SCALES = {
 	"action_bar": Vector2(1, 1),
 	"cast_bar": Vector2(1, 1),
+	"player_cast_bar": Vector2(1, 1),
 	"fail_list": Vector2(1, 1),
 	"party_list": Vector2(1, 1),
 	"player_debuffs": Vector2(2, 2),

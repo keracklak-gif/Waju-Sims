@@ -9,6 +9,8 @@ extends Node
 
 class_name PlayerMovementController
 
+signal cast_interrupted()
+
 const MAX_MOUSE_CLICK_MOVEMENT := 3000.0
 
 const BASE_MOUSE_SENS := 0.002
@@ -53,6 +55,9 @@ var running := false
 var last_input_back := false
 var is_frozen := false
 var spectate_mode: bool
+# Healer practice cast (see start_cast()).
+var casting := false
+var cast_time_left := 0.0
 
 @onready var player: Player = $".."
 @onready var twist_pivot : Node3D = %TwistPivot
@@ -107,6 +112,13 @@ func _physics_process(delta : float) -> void:
 		Input.action_press("move_forward")
 	
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	if casting:
+		cast_time_left -= delta
+		if input.length() > 0.0 and cast_time_left > Global.SLIDECAST_WINDOW:
+			casting = false
+			cast_interrupted.emit()
+		elif cast_time_left <= 0.0:
+			casting = false
 	
 	var dir := (twist_pivot.transform.basis * Vector3(input.x, 0, input.y)).normalized()
 	if player.is_on_floor() and !player.sliding:
@@ -266,6 +278,11 @@ func arms_length() -> void:
 	add_child(timer)
 	timer.timeout.connect(func() -> void: player.kb_resist = false)
 	timer.start()
+
+
+func start_cast(cast_time: float) -> void:
+	casting = true
+	cast_time_left = cast_time
 
 
 func sprint() -> void:
