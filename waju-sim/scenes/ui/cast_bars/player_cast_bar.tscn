@@ -1,0 +1,109 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/cast_bars/player_cast_bar.gd" id="1_pcb01"]
+[ext_resource type="PackedScene" uid="uid://c6lwk2vknoj7w" path="res://scenes/ui/move_ui_reset_button.tscn" id="4_muirb"]
+[ext_resource type="FontFile" uid="uid://dflgosesmjvf" path="res://assets/common/fonts/MYRIADPRO-BOLD.OTF" id="1_uiasi"]
+[ext_resource type="FontFile" uid="uid://46wxmrxlq74f" path="res://assets/common/fonts/eurostarregularextended.ttf" id="3_gv24i"]
+
+[sub_resource type="Theme" id="Theme_vadjc"]
+default_font = ExtResource("1_uiasi")
+default_font_size = 16
+
+[sub_resource type="LabelSettings" id="LabelSettings_lc2st"]
+outline_size = 3
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_haxh7"]
+bg_color = Color(0.156863, 0.137255, 0.0313726, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.968627, 0.6, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eit2t"]
+bg_color = Color(0.4, 0.7, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3n2w0"]
+bg_color = Color(0.267, 0.267, 0.267, 0.741)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.780392, 0.501961, 0.360784, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_gth00"]
+font = ExtResource("3_gv24i")
+font_size = 15
+outline_size = 3
+outline_color = Color(0.780392, 0.501961, 0.360784, 1)
+
+[node name="PlayerCastBar" type="CanvasLayer" groups=["player_cast_bar"]]
+visible = false
+script = ExtResource("1_pcb01")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = -1
+anchor_left = 0.463
+anchor_top = 0.66
+anchor_right = 0.463
+anchor_bottom = 0.66
+offset_left = 0.64801
+offset_top = -0.791992
+offset_right = 220.648
+offset_bottom = 29.208
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme = SubResource("Theme_vadjc")
+label_settings = SubResource("LabelSettings_lc2st")
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_haxh7")
+theme_override_styles/fill = SubResource("StyleBoxFlat_eit2t")
+max_value = 1.0
+value = 0.5
+show_percentage = false
+
+[node name="MoveUIBG" type="Panel" parent="MarginContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_3n2w0")
+
+[node name="MoveUIResetButton" parent="MarginContainer/MoveUIBG" instance=ExtResource("4_muirb")]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 228.0
+offset_top = -8.0
+offset_right = 327.0
+offset_bottom = 30.0
+
+[node name="Label" type="Label" parent="MarginContainer/MoveUIBG"]
+layout_mode = 0
+offset_left = 49.0
+offset_right = 220.0
+offset_bottom = 25.0
+text = "Player Cast Bar"
+label_settings = SubResource("LabelSettings_gth00")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Timer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="gui_input" from="MarginContainer" to="." method="_on_margin_container_gui_input"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

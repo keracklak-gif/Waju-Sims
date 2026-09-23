@@ -18,11 +18,16 @@ const _6_ICON = preload("res://assets/common/icons/ui_icons/6_icon.png")
 const _7_ICON = preload("res://assets/common/icons/ui_icons/7_icon.png")
 const _8_ICON = preload("res://assets/common/icons/ui_icons/8_icon.png")
 const DEBUFF_SCENE = preload("uid://cu7ghooei6mv5")
+const ALT_HEALER_JOB_ICONS := {
+	"h1": preload("res://assets/common/icons/job_icons/ast_icon.png"),
+	"h2": preload("res://assets/common/icons/job_icons/sge_icon.png"),
+}
 
 @onready var index_icons := [_1_ICON, _2_ICON, _3_ICON, _4_ICON, _5_ICON, _6_ICON, _7_ICON, _8_ICON]
 @onready var index_icon_texture: TextureRect = $HBoxContainer/VBoxContainer/InfoLabels/IndexIconTexture
 @onready var role_label: Label = $HBoxContainer/VBoxContainer/InfoLabels/RoleLabelScale/RoleLabel
 @onready var aura_container: HBoxContainer = $AuraContainer
+@onready var role_icon_texture: TextureRect = $HBoxContainer/RoleIcon/RoleIconTexture
 @onready var player_debuff_container : BoxContainer = get_tree().get_first_node_in_group("player_debuff_container")
 
 var is_player := false
@@ -41,6 +46,10 @@ func set_index_icon(index: int):
 
 func set_role_key(role_key: String):
 	_role_key = role_key
+	if Global.HEALER_JOB_SETTING_KEYS.has(role_key):
+		var setting_key: String = Global.HEALER_JOB_SETTING_KEYS[role_key]
+		if SavedVariables.save_data["settings"][setting_key] == 1:
+			role_icon_texture.texture = ALT_HEALER_JOB_ICONS[role_key]
 
 
 func add_debuff(role_key : String, debuff_icon_scene : PackedScene, duration : float,

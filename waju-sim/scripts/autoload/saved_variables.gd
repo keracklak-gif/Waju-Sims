@@ -16,6 +16,8 @@ var config_file: ConfigFile
 var save_data: Dictionary = {
 	"settings": {
 		"player_role": 0,
+		"healer1_job": 0,
+		"healer2_job": 0,
 		"screen_res": Vector2i(1600, 900),
 		"screen_pos": null,
 		"maximized": false,
@@ -48,6 +50,7 @@ var save_data: Dictionary = {
 		"ab2_arms": KEY_2,
 		"ab3_dash": KEY_3,
 		"ab4_mit": KEY_4,
+		"ab5_cast": KEY_5,
 		"reset": KEY_R,
 		"move_ui": KEY_ALT
 	},

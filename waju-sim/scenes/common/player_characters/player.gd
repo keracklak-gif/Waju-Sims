@@ -109,3 +109,7 @@ func sprint() -> void:
 
 func is_player_frozen() -> bool:
 	return player_movement_controller.is_frozen
+
+
+func start_cast(cast_time: float) -> void:
+	player_movement_controller.start_cast(cast_time)

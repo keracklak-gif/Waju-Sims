@@ -253,8 +253,19 @@ func set_look_direction(new_look_direction : Vector3) -> void:
 	look_direction = new_look_direction
 
 
+const ALT_HEALER_JOB_ICON_SCENES := {
+	"h1": "res://scenes/common/player_characters/lockon/role_icons/h1_astrologian_icon.tscn",
+	"h2": "res://scenes/common/player_characters/lockon/role_icons/h2_sage_icon.tscn",
+}
+
+
 func set_role_icon():
-	var icon_scene: PackedScene = load(ROLE_ICON_PATHS[role_key])
+	var icon_path: String = ROLE_ICON_PATHS[role_key]
+	if Global.HEALER_JOB_SETTING_KEYS.has(role_key):
+		var setting_key: String = Global.HEALER_JOB_SETTING_KEYS[role_key]
+		if SavedVariables.save_data["settings"][setting_key] == 1:
+			icon_path = ALT_HEALER_JOB_ICON_SCENES[role_key]
+	var icon_scene: PackedScene = load(icon_path)
 	var icon_node: Node3D = icon_scene.instantiate()
 	role_icon_container.add_child(icon_node)
 
