@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://7wp50uql53uc" path="res://assets/common/icons/action_icons/avant_hl_icon.png" id="5_vknay"]
 [ext_resource type="FontFile" uid="uid://46wxmrxlq74f" path="res://assets/common/fonts/eurostarregularextended.ttf" id="7_pjfqq"]
 [ext_resource type="PackedScene" path="res://scenes/ui/cast_bars/player_cast_bar.tscn" id="8_pcb01"]
+[ext_resource type="PackedScene" path="res://scenes/ui/target_debuff_bar.tscn" id="9_tdbuf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2v8av"]
 bg_color = Color(0.267, 0.267, 0.267, 0.741)
@@ -81,7 +82,17 @@ size_flags_vertical = 0
 mouse_filter = 1
 cooldown = 2.5
 
+[node name="DotActionButton" parent="MarginContainer/ButtonsContainer" unique_id=1470176661 instance=ExtResource("1_oxg47")]
+custom_minimum_size = Vector2(45, 45)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 1
+cooldown = 2.5
+
 [node name="PlayerCastBar" parent="." unique_id=1470176650 instance=ExtResource("8_pcb01")]
+
+[node name="TargetDebuffBar" parent="." unique_id=1470176663 instance=ExtResource("9_tdbuf")]
 
 [node name="MoveUIBG" type="Panel" parent="MarginContainer" unique_id=1869405542]
 unique_name_in_owner = true

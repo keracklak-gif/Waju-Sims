@@ -1,0 +1,62 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/target_debuff_bar.gd" id="1_tdbuf"]
+[ext_resource type="FontFile" uid="uid://46wxmrxlq74f" path="res://assets/common/fonts/eurostarregularextended.ttf" id="2_tdbuf"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tdbuf"]
+bg_color = Color(0.267, 0.267, 0.267, 0.741)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.780392, 0.501961, 0.360784, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_tdbuf"]
+font = ExtResource("2_tdbuf")
+font_size = 20
+outline_size = 3
+outline_color = Color(0.780392, 0.501961, 0.360784, 1)
+
+[node name="TargetDebuffBar" type="CanvasLayer"]
+visible = false
+script = ExtResource("1_tdbuf")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = -1
+anchor_left = 0.463
+anchor_top = 0.6
+anchor_right = 0.463
+anchor_bottom = 0.6
+offset_right = 200.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+
+[node name="TargetDebuffsContainer" type="HBoxContainer" parent="MarginContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="MoveUIBG" type="Panel" parent="MarginContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_tdbuf")
+
+[node name="Label" type="Label" parent="MarginContainer/MoveUIBG"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 12.0
+offset_right = 190.0
+offset_bottom = 37.0
+text = "Target Debuffs"
+label_settings = SubResource("LabelSettings_tdbuf")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="gui_input" from="MarginContainer" to="." method="_on_margin_container_gui_input"]

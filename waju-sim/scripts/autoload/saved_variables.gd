@@ -55,6 +55,7 @@ var save_data: Dictionary = {
 		"ab3_dash": KEY_3,
 		"ab4_mit": KEY_4,
 		"ab5_cast": KEY_5,
+		"ab6_dot": KEY_6,
 		"reset": KEY_R,
 		"move_ui": KEY_ALT
 	},
