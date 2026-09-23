@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://bw67wbi2y10qu" path="res://scenes/ui/action_button.tscn" id="1_habtn"]
+[ext_resource type="Script" path="res://scenes/ui/healer_ability_bar/healer_ability_button.gd" id="2_habtn"]
+
+[node name="HealerAbilityButton" instance=ExtResource("1_habtn")]
+custom_minimum_size = Vector2(45, 45)
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource("2_habtn")

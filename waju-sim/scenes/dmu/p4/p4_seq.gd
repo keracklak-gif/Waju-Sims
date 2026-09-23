@@ -105,6 +105,7 @@ const DEBUFF_ORDER := ["black_wound", "white_wound", "beyond_death", "allagan_fi
 @onready var chat_log: ChatLog = %ChatLog
 @onready var echo_chat_log: ChatLog = %EchoChatLog
 @onready var macro_bar: MacroBar = %MacroBar
+@onready var action_bar: CanvasLayer = %ActionBar
 @onready var labeling_macro_bar: MacroBar = %LabelingMacroBar
 @onready var target_marker_controller: TargetMarkerController = %TargetMarkerController
 @onready var p4_anim: AnimationPlayer = %P4Anim
@@ -180,6 +181,8 @@ func start_sequence(new_party: Dictionary) -> void:
 	encounter_menu.toggle_macro_bar.connect(on_toggle_macro_bar)
 	setup_labeling_macro_bar()
 	encounter_menu.toggle_labeling_macros.connect(on_toggle_labeling_macros)
+	on_toggle_healer_cooldowns(DmuSavedVariables.get_data_and_check_bool("settings", "p4_healer_cooldowns"))
+	encounter_menu.toggle_healer_cooldowns.connect(on_toggle_healer_cooldowns)
 	p4_anim.play("p4_anim")
 	#p4_anim.play_section("p4_anim", 40.0)
 
@@ -213,6 +216,11 @@ func setup_labeling_macro_bar() -> void:
 func on_toggle_labeling_macros(is_visible: bool) -> void:
 	labeling_macro_bar.visible = is_visible
 	echo_chat_log.visible = is_visible
+
+
+# Healer casting practice: the filler cast button and the healer cooldown bar.
+func on_toggle_healer_cooldowns(is_visible: bool) -> void:
+	action_bar.set_healer_cooldowns_visible(is_visible)
 
 
 # Pressing the marker already worn clears it; pressing the other one swaps,
@@ -804,6 +812,16 @@ func tsunami_hit():
 
 # 115.6 Kefka Cast Ultima Upsurge (4.7s)
 ## cast_ultima()
+
+
+# 12.4, 17.4, 27.3, 32.4, 42.4, 55.0, 63.8, 81.6, 88.7, 120.3 - Raidwide hits
+# (Grand Cross/Inferno/Tsunami cast ends, Flood, Death Bolt/Wave, Ultima Upsurge).
+# Healer Cooldowns: fail if the player's planned mitigation isn't up.
+func check_healer_mit(index: int) -> void:
+	var healer_bar: HealerAbilityBar = action_bar.healer_ability_bar
+	if Global.spectate_mode or not healer_bar.visible:
+		return
+	P4HealerMit.check(index, healer_bar.controller, healer_bar.job_name, fail_list)
 
 
 ## END OF TIMELINE

@@ -33,6 +33,7 @@ var save_data: Dictionary = {
 		"p4_bobot_callouts": true,
 		"p4_macro_bar": false,
 		"p4_labeling_macros": false,
+		"p4_healer_cooldowns": false,
 		#"p4_ct_aero_plant": false,
 	},
 	## FRU Waymarks

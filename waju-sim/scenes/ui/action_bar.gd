@@ -8,8 +8,10 @@ extends MovableCanvasLayer
 @onready var sprint_action_button: ActionButton = $MarginContainer/ButtonsContainer/SprintActionButton
 @onready var arms_action_button: ActionButton = $MarginContainer/ButtonsContainer/ArmsActionButton
 @onready var dash_action_button: ActionButton = $MarginContainer/ButtonsContainer/DashActionButton
-@onready var cast_action_button: ActionButton = $MarginContainer/ButtonsContainer/CastActionButton
+@onready var cast_action_button: HealerAbilityButton = $MarginContainer/ButtonsContainer/CastActionButton
 @onready var player_cast_bar: PlayerCastBar = $PlayerCastBar
+@onready var healer_ability_bar: HealerAbilityBar = $HealerAbilityBar
+@onready var healer_buff_bar: HealerBuffBar = $HealerBuffBar
 @onready var parent_node = $".."
 @onready var control_menu: CanvasLayer = %ControlMenu
 @onready var move_ui_bg: Panel = %MoveUIBG
@@ -52,7 +54,10 @@ func _unhandled_input(event : InputEvent) -> void:
 		elif keycode == keybinds["ab3_dash"]:
 			dash_action_button._on_pressed()
 		elif keycode == keybinds["ab5_cast"] and cast_action_button.visible:
-			cast_action_button._on_pressed()
+			if event.is_pressed() and not event.is_echo():
+				cast_action_button._on_pressed()
+		elif event.is_pressed() and not event.is_echo() and healer_ability_bar.handle_key(keycode):
+			pass
 		elif keycode == keybinds["reset"]:
 			if Input.is_action_just_pressed("reset"):  # Needed to stop ghost input from hanging after reset.
 				parent_node._on_reset_button_pressed()
@@ -75,11 +80,20 @@ func on_party_ready() -> void:
 	cast_action_button.visible = Global.HEALER_JOBS.has(Global.player_role_key)
 	if cast_action_button.visible:
 		var job: Dictionary = get_current_healer_job()
-		var icon: Texture2D = load(job["icon"])
-		cast_action_button.texture_normal = icon
+		cast_action_button.texture_normal = load(job["icon"])
 		cast_action_button.texture_hover = load(job["icon_hl"])
-		cast_action_button.cooldown_sweep.texture_progress = icon
-		player.player_movement_controller.cast_interrupted.connect(on_cast_interrupted)
+		var filler := {"id": "filler", "name": job["spell_name"], "gcd": true,
+			"cast_time": job["cast_time"], "job_name": job["job_name"]}
+		healer_ability_bar.setup(player, player_cast_bar, filler, cast_action_button, healer_buff_bar)
+
+
+## Shows or hides healer casting practice: the filler cast button and the
+## healer cooldown bar together. Phases that never call this keep the filler
+## button on for healers and the cooldown bar off.
+func set_healer_cooldowns_visible(is_visible: bool) -> void:
+	var shown := is_visible and Global.HEALER_JOBS.has(Global.player_role_key)
+	cast_action_button.visible = shown
+	healer_ability_bar.set_bar_visible(shown)
 
 
 func get_current_healer_job() -> Dictionary:
@@ -132,17 +146,7 @@ func on_cast_pressed() -> void:
 		if !player:
 			print("Tried to cast, but Player node could not be found.")
 			return
-	var job: Dictionary = get_current_healer_job()
-	player.start_cast(job["cast_time"])
-	player_cast_bar.cast(job["spell_name"], job["cast_time"])
-
-
-# Player moved before the slidecast window - the cast never went off, so
-# there's no GCD to recover from. Clear the bar and free the button right away.
-func on_cast_interrupted() -> void:
-	player_cast_bar.clear_casts()
-	cast_action_button.cooldown_timer.stop()
-	cast_action_button._on_cooldown_timer_timeout()
+	healer_ability_bar.use(cast_action_button.ability)
 
 
 func _on_margin_container_gui_input(event: InputEvent) -> void:
