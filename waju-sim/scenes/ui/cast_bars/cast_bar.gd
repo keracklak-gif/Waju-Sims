@@ -30,7 +30,7 @@ func _process(_delta : float) -> void:
 func init_position():
 	GameEvents.toggle_move_ui.connect(on_toggle_move_ui)
 	margin_container = $MarginContainer
-	move_ui_reset_button  = %MoveUIResetButton
+	move_ui_reset_button  = find_move_ui_reset_button()
 	move_ui_reset_button.reset_position.connect(reset_position)
 	load_position_and_scale()
 

@@ -79,15 +79,25 @@ func move_and_save_container():
 
 func init_position():
 	GameEvents.toggle_move_ui.connect(on_toggle_move_ui)
-	
+
 	margin_container = $MarginContainer
-	move_ui_reset_button  = %MoveUIResetButton
+	move_ui_reset_button  = find_move_ui_reset_button()
 
 	#margin_container_start_position = margin_container.position
 	#move_ui_reset_button.save_position.connect(save_position)
 	move_ui_reset_button.reset_position.connect(reset_position)
 	load_position_and_scale()
 	set_process(false)
+
+
+## The phase scene owns the single MoveUIResetButton. Bars nested in another
+## UI scene (e.g. inside ActionBar) can't see the phase's unique names, so
+## look it up from the parent's scope instead.
+func find_move_ui_reset_button() -> MoveUiResetButton:
+	var button: MoveUiResetButton = get_node_or_null("%MoveUIResetButton")
+	if button == null:
+		button = get_parent().get_node_or_null("%MoveUIResetButton")
+	return button
 
 
 func load_position_and_scale():
