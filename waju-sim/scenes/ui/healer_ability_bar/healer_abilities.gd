@@ -135,8 +135,9 @@ static func all_for_job(job_name: String) -> Array:
 	return all
 
 
+## Abilities defined outside this file (filler, DoT) carry their own "icon".
 static func icon_path(ability: Dictionary) -> String:
-	return icon_path_for_id(ability["id"])
+	return ability.get("icon", icon_path_for_id(ability["id"]))
 
 
 static func icon_path_for_id(id: String) -> String:

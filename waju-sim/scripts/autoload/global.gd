@@ -32,18 +32,33 @@ const HEALER_JOBS := {
 	"h1": [
 		{"job_name": "White Mage", "spell_name": "Glare", "cast_time": 1.5,
 			"icon": "res://assets/common/icons/action_icons/glare_icon.png",
-			"icon_hl": "res://assets/common/icons/action_icons/glare_hl_icon.png"},
+			"icon_hl": "res://assets/common/icons/action_icons/glare_hl_icon.png",
+			"dot": {"spell_name": "Dia", "duration": 30.0,
+				"icon": "res://assets/common/icons/action_icons/dia_icon.png",
+				"icon_hl": "res://assets/common/icons/action_icons/dia_hl_icon.png"}},
 		{"job_name": "Astrologian", "spell_name": "Malefic", "cast_time": 1.5,
 			"icon": "res://assets/common/icons/action_icons/malefic_icon.png",
-			"icon_hl": "res://assets/common/icons/action_icons/malefic_hl_icon.png"},
+			"icon_hl": "res://assets/common/icons/action_icons/malefic_hl_icon.png",
+			"dot": {"spell_name": "Combust III", "duration": 30.0,
+				"icon": "res://assets/common/icons/action_icons/combust_iii_icon.png",
+				"icon_hl": "res://assets/common/icons/action_icons/combust_iii_hl_icon.png"}},
 	],
 	"h2": [
 		{"job_name": "Scholar", "spell_name": "Broil", "cast_time": 1.5,
 			"icon": "res://assets/common/icons/action_icons/broil_icon.png",
-			"icon_hl": "res://assets/common/icons/action_icons/broil_hl_icon.png"},
+			"icon_hl": "res://assets/common/icons/action_icons/broil_hl_icon.png",
+			"dot": {"spell_name": "Biolysis", "duration": 30.0,
+				"icon": "res://assets/common/icons/action_icons/biolysis_icon.png",
+				"icon_hl": "res://assets/common/icons/action_icons/biolysis_hl_icon.png"}},
 		{"job_name": "Sage", "spell_name": "Dosis", "cast_time": 1.5,
 			"icon": "res://assets/common/icons/action_icons/dosis_icon.png",
-			"icon_hl": "res://assets/common/icons/action_icons/dosis_hl_icon.png"},
+			"icon_hl": "res://assets/common/icons/action_icons/dosis_hl_icon.png",
+			# Sage's DoT needs Eukrasia first, which turns both Dosis and the DoT
+			# button into Eukrasian Dosis III (see ActionBar.make_dot_abilities()).
+			"dot": {"spell_name": "Eukrasian Dosis III", "duration": 30.0,
+				"icon": "res://assets/common/icons/action_icons/eukrasian_dosis_iii_icon.png",
+				"icon_hl": "res://assets/common/icons/action_icons/eukrasian_dosis_iii_hl_icon.png",
+				"needs_eukrasia": true}},
 	],
 }
 const HEALER_JOB_SETTING_KEYS := {"h1": "healer1_job", "h2": "healer2_job"}
