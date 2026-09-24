@@ -49,7 +49,8 @@ func add_entry(status: String) -> void:
 	icon.custom_minimum_size = ICON_SIZE
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.texture = load(HealerAbilities.icon_path_for_id(controller.status_sources[status]))
+	var source: String = controller.status_sources[status]
+	icon.texture = load(HealerAbilities.icon_path(controller.abilities.get(source, {"id": source})))
 	icon.tooltip_text = HealerAbilities.status_name(status)
 	var label := Label.new()
 	label.label_settings = label_settings
