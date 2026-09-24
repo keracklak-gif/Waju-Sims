@@ -59,6 +59,12 @@ const BY_JOB := {
 			"grants": {"seraph": 22.0},
 			"follow_up": {"id": "consolation", "name": "Consolation", "recast": 30.0, "charges": 2,
 				"requires": "seraph", "grants": {"consolation": 30.0}}},
+		# The party-wide Galvanize shield (Succor's upgrade). Last, so adding it
+		# didn't shift the earlier slots' keybinds.
+		{"id": "concitation", "name": "Concitation", "gcd": true, "cast_time": 2.0,
+			"fallback_icon": "adloquium",
+			"uses": ["recitation"], "grants": {"galvanize": 30.0},
+			"boost": {"status": "recitation", "grants": {"galvanize": 30.0, "catalyze": 30.0}}},
 	],
 	"Sage": [
 		{"id": "kerachole", "name": "Kerachole", "recast": 30.0,
@@ -71,7 +77,10 @@ const BY_JOB := {
 			"grants": {"panhaima": 15.0}},
 		{"id": "zoe", "name": "Zoe", "recast": 90.0, "grants": {"zoe": 30.0}},
 		{"id": "eukrasia", "name": "Eukrasia", "gcd": true, "gcd_recast": 1.0,
-			"grants": {"eukrasia": -1.0},
+			"grants": {"eukrasia": -1.0}},
+		# The party heal. Eukrasia turns it into the Eukrasian Prognosis II shield.
+		{"id": "prognosis", "name": "Prognosis", "gcd": true, "cast_time": 2.0,
+			"fallback_icon": "eukrasian_prognosis_ii", "uses": ["zoe"],
 			"follow_up": {"id": "eukrasian_prognosis_ii", "name": "Eukrasian Prognosis II",
 				"gcd": true, "gcd_recast": 1.5, "requires": "eukrasia", "consumes": true,
 				"uses": ["zoe"], "grants": {"eukrasian_prognosis": 30.0},
@@ -136,8 +145,12 @@ static func all_for_job(job_name: String) -> Array:
 
 
 ## Abilities defined outside this file (filler, DoT) carry their own "icon".
+## A "fallback_icon" (another ability's id) stands in while the icon is missing.
 static func icon_path(ability: Dictionary) -> String:
-	return ability.get("icon", icon_path_for_id(ability["id"]))
+	var path: String = ability.get("icon", icon_path_for_id(ability["id"]))
+	if ability.has("fallback_icon") and not ResourceLoader.exists(path):
+		return icon_path_for_id(ability["fallback_icon"])
+	return path
 
 
 static func icon_path_for_id(id: String) -> String:
