@@ -47,11 +47,6 @@ const BY_JOB := {
 		{"id": "adloquium", "name": "Adloquium", "gcd": true, "cast_time": 2.0,
 			"uses": ["recitation"], "grants": {"galvanize": 30.0},
 			"boost": {"status": "recitation", "grants": {"galvanize": 30.0, "catalyze": 30.0}}},
-		# The party-wide Galvanize shield (Succor's upgrade).
-		{"id": "concitation", "name": "Concitation", "gcd": true, "cast_time": 2.0,
-			"fallback_icon": "adloquium",
-			"uses": ["recitation"], "grants": {"galvanize": 30.0},
-			"boost": {"status": "recitation", "grants": {"galvanize": 30.0, "catalyze": 30.0}}},
 		# Spreads the shield for its remaining time. A crit (Catalyze) one is a Spreadlo.
 		{"id": "deployment_tactics", "name": "Deployment Tactics", "recast": 90.0,
 			"requires": "galvanize", "grants": {"deployed_galvanize": "=galvanize"},
@@ -64,6 +59,12 @@ const BY_JOB := {
 			"grants": {"seraph": 22.0},
 			"follow_up": {"id": "consolation", "name": "Consolation", "recast": 30.0, "charges": 2,
 				"requires": "seraph", "grants": {"consolation": 30.0}}},
+		# The party-wide Galvanize shield (Succor's upgrade). Last, so adding it
+		# didn't shift the earlier slots' keybinds.
+		{"id": "concitation", "name": "Concitation", "gcd": true, "cast_time": 2.0,
+			"fallback_icon": "adloquium",
+			"uses": ["recitation"], "grants": {"galvanize": 30.0},
+			"boost": {"status": "recitation", "grants": {"galvanize": 30.0, "catalyze": 30.0}}},
 	],
 	"Sage": [
 		{"id": "kerachole", "name": "Kerachole", "recast": 30.0,
