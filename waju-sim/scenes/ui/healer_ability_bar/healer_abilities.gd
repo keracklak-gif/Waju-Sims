@@ -3,8 +3,8 @@
 # This file is released under "GNU General Public License 3.0".
 # Please see the LICENSE file that should have been included as part of this package.
 
-## Healer cooldowns per job, covering the P4 (Kefka Says) healer mitigation
-## plan. Recast, cast and buff durations from the official job guide. See
+## Healer cooldowns per job, covering the P4 (Kefka Says) and P5 (Kefka
+## Reimagined) healer mitigation plans. Recast, cast and buff durations from the official job guide. See
 ## HealerActionController for what each key means. Order = hotbar slot order.
 ## A "follow_up" shares its base ability's slot: the button turns into it
 ## while it's usable (HealerAbilityButton), like FFXIV's replacement actions.
@@ -44,9 +44,13 @@ const BY_JOB := {
 		{"id": "recitation", "name": "Recitation", "recast": 60.0,
 			"grants": {"recitation": 15.0}},
 		# Recitation guarantees the critical heal, which adds Catalyze.
+		# Seraphism turns it into the instant Manifestation.
 		{"id": "adloquium", "name": "Adloquium", "gcd": true, "cast_time": 2.0,
 			"uses": ["recitation"], "grants": {"galvanize": 30.0},
-			"boost": {"status": "recitation", "grants": {"galvanize": 30.0, "catalyze": 30.0}}},
+			"boost": {"status": "recitation", "grants": {"galvanize": 30.0, "catalyze": 30.0}},
+			"follow_up": {"id": "manifestation", "name": "Manifestation", "gcd": true,
+				"fallback_icon": "adloquium", "requires": "seraphism",
+				"grants": {"galvanize": 30.0}}},
 		# Spreads the shield for its remaining time. A crit (Catalyze) one is a Spreadlo.
 		{"id": "deployment_tactics", "name": "Deployment Tactics", "recast": 90.0,
 			"requires": "galvanize", "grants": {"deployed_galvanize": "=galvanize"},
@@ -60,11 +64,18 @@ const BY_JOB := {
 			"follow_up": {"id": "consolation", "name": "Consolation", "recast": 30.0, "charges": 2,
 				"requires": "seraph", "grants": {"consolation": 30.0}}},
 		# The party-wide Galvanize shield (Succor's upgrade). Last, so adding it
-		# didn't shift the earlier slots' keybinds.
+		# didn't shift the earlier slots' keybinds. Seraphism turns it into the
+		# instant Accession.
 		{"id": "concitation", "name": "Concitation", "gcd": true, "cast_time": 2.0,
 			"fallback_icon": "adloquium",
 			"uses": ["recitation"], "grants": {"galvanize": 30.0},
-			"boost": {"status": "recitation", "grants": {"galvanize": 30.0, "catalyze": 30.0}}},
+			"boost": {"status": "recitation", "grants": {"galvanize": 30.0, "catalyze": 30.0}},
+			"follow_up": {"id": "accession", "name": "Accession", "gcd": true,
+				"fallback_icon": "adloquium", "requires": "seraphism",
+				"grants": {"galvanize": 30.0}}},
+		# P5 (Forsaken). After Concitation for the same keybind reason.
+		{"id": "seraphism", "name": "Seraphism", "recast": 180.0,
+			"fallback_icon": "summon_seraph", "grants": {"seraphism": 20.0}},
 	],
 	"Sage": [
 		{"id": "kerachole", "name": "Kerachole", "recast": 30.0,
@@ -117,6 +128,7 @@ const STATUS_NAMES := {
 	"fey_illumination": "Fey Illumination",
 	"seraph": "Seraph",
 	"consolation": "Seraph (Consolation)",
+	"seraphism": "Seraphism",
 	"kerachole": "Kerachole",
 	"philosophia": "Philosophia",
 	"holos": "Holos",

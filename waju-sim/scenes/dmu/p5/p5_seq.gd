@@ -84,6 +84,7 @@ const _RS1 := Vector2(0.3, 0.2)
 @onready var enemy_cast_bar: EnemyCastBar = %EnemyCastBar
 @onready var celest_towers: CelestTowers = %CelestTowers
 @onready var fail_list: FailList = %FailList
+@onready var action_bar: CanvasLayer = %ActionBar
 @onready var special_markers: Node3D = %SpecialMarkers
 @onready var earth_rings: Node3D = %EarthRings
 @onready var wind_rings: Node3D = %WindRings
@@ -117,6 +118,8 @@ func start_sequence(new_party: Dictionary) -> void:
 	instantiate_party(new_party)
 	on_toggle_bots_visible()
 	encounter_menu.toggle_bots_visible.connect(on_toggle_bots_visible)
+	on_toggle_healer_cooldowns(DmuSavedVariables.get_data_and_check_bool("settings", "p5_healer_cooldowns"))
+	encounter_menu.toggle_healer_cooldowns.connect(on_toggle_healer_cooldowns)
 	## Start animation sequence
 	match starting_point:
 		StartPoint.FLOOD:
@@ -507,6 +510,17 @@ func fors_4_hit():
 	lockon_controller.remove_marker(LockonController.STACK_MARKER, party[stack_tar_key])
 
 
+# 0:05.7, 0:11.0, 0:23.8, 0:36.5, 0:47.9, 1:06.7, 1:27.6, 1:33.1, 2:08.7 - Raidwide
+# hits (Repeater, Fell Forces, Flood, Maddening, Celestriad tower 1).
+# 2:38.0 - 3:07.0 - The 8 Forsaken/Forsaken Bonds hits (each fors_N_tele/_hit).
+# Healer Cooldowns: fail if the player's planned mitigation isn't up.
+func check_healer_mit(index: int) -> void:
+	var healer_bar: HealerAbilityBar = action_bar.healer_ability_bar
+	if Global.spectate_mode or not healer_bar.visible:
+		return
+	P5HealerMit.check(index, healer_bar.controller, healer_bar.job_name, fail_list)
+
+
 ## ===========================END OF TIMELINE===================================
 
 
@@ -685,6 +699,11 @@ func on_toggle_bots_visible() -> void:
 		if pc.is_player():
 			continue
 		pc.visible = bots_visible
+
+
+# Healer casting practice: the filler cast button and the healer cooldown bar.
+func on_toggle_healer_cooldowns(is_visible: bool) -> void:
+	action_bar.set_healer_cooldowns_visible(is_visible)
 
 
 func get_nearest_player_keys(position: Vector2, count: int) -> Array:

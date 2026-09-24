@@ -64,6 +64,7 @@ var save_data: Dictionary = {
 		"hab6": KEY_MASK_SHIFT | KEY_6,
 		"hab7": KEY_MASK_SHIFT | KEY_7,
 		"hab8": KEY_MASK_SHIFT | KEY_8,
+		"hab9": KEY_MASK_SHIFT | KEY_9,
 		"reset": KEY_R,
 		"move_ui": KEY_ALT
 	},

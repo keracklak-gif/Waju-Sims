@@ -4,7 +4,7 @@
 # Please see the LICENSE file that should have been included as part of this package.
 
 ## Hotbar of the selected healer job's cooldowns (HealerAbilities), bound to
-## the hab1..hab8 keybinds (Shift+1..8 by default). Owns the
+## the hab1..hab9 keybinds (Shift+1..9 by default). Owns the
 ## HealerActionController that also times the action bar's filler cast, so
 ## filler and heal GCDs share one GCD and oGCDs can only be woven between
 ## casts. Hidden until ActionBar shows it.
@@ -15,7 +15,7 @@ class_name HealerAbilityBar
 
 const BUTTON_SCENE := preload("res://scenes/ui/healer_ability_bar/healer_ability_button.tscn")
 ## Saved keybind names, one per slot. Rebindable in the Controls menu.
-const SLOT_KEYBINDS := ["hab1", "hab2", "hab3", "hab4", "hab5", "hab6", "hab7", "hab8"]
+const SLOT_KEYBINDS := ["hab1", "hab2", "hab3", "hab4", "hab5", "hab6", "hab7", "hab8", "hab9"]
 ## Modifier prefixes shortened so a combo fits on a button, e.g. "Shift+1" -> "S1".
 const SHORT_MODIFIERS := {"Shift+": "S", "Ctrl+": "C", "Alt+": "A", "Meta+": "M"}
 
