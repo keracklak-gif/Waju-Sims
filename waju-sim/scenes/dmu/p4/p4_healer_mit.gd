@@ -14,42 +14,42 @@
 class_name P4HealerMit
 
 const MECHANICS := [
-	{"name": "Grand Cross", "sheet_time": "0:29", # p4_anim 12.4
+	{"name": "Grand Cross", "sheet_time": "0:29", "time": 12.4,
 		"new": {"White Mage": ["confession"], "Astrologian": ["collective_unconscious"],
 			"Scholar": ["spreadlo", "sacred_soil"], "Sage": ["kerachole", "philosophia", "holos"]},
 		"carry": {}},
-	{"name": "Inferno/Tsunami", "sheet_time": "0:35", # 17.4
+	{"name": "Inferno/Tsunami", "sheet_time": "0:35", "time": 17.4,
 		"new": {},
 		"carry": {"White Mage": ["confession"], "Astrologian": ["collective_unconscious"],
 			"Scholar": ["sacred_soil"], "Sage": ["kerachole", "holos"]}},
-	{"name": "Grand Cross", "sheet_time": "0:44", # 27.3
+	{"name": "Grand Cross", "sheet_time": "0:44", "time": 27.3,
 		"new": {"White Mage": ["temperance"], "Astrologian": ["neutral_sect"],
 			"Scholar": ["expedient", "fey_illumination"], "Sage": ["panhaima"]},
 		"carry": {"Sage": ["holos"]}},
-	{"name": "Inferno/Tsunami", "sheet_time": "0:49", # 32.4
+	{"name": "Inferno/Tsunami", "sheet_time": "0:49", "time": 32.4,
 		"new": {"Astrologian": ["sun_sign"], "Scholar": ["consolation"]},
 		"carry": {"White Mage": ["temperance"], "Astrologian": ["neutral_sect"],
 			"Scholar": ["expedient", "fey_illumination"], "Sage": ["panhaima"]}},
-	{"name": "Grand Cross", "sheet_time": "0:59", # 42.4
+	{"name": "Grand Cross", "sheet_time": "0:59", "time": 42.4,
 		"new": {"White Mage": ["divine_caress"], "Scholar": ["consolation"], "Sage": ["zoe_shields"]},
 		"carry": {"White Mage": ["temperance"], "Astrologian": ["neutral_sect", "sun_sign"],
 			"Scholar": ["expedient", "fey_illumination"]}},
-	{"name": "Flood of Naught", "sheet_time": "1:11", # 55.0
+	{"name": "Flood of Naught", "sheet_time": "1:11", "time": 55.0,
 		"new": {"White Mage": ["liturgy_of_the_bell"], "Astrologian": ["macrocosmos"],
 			"Scholar": ["sacred_soil"], "Sage": ["kerachole"]},
 		"carry": {}},
-	{"name": "Death Bolt/Wave", "sheet_time": "1:21", # 63.8
+	{"name": "Death Bolt/Wave", "sheet_time": "1:21", "time": 63.8,
 		"new": {},
 		"carry": {"Scholar": ["sacred_soil"], "Sage": ["kerachole"]}},
-	{"name": "Ultima Upsurge", "sheet_time": "1:39", # 81.6
+	{"name": "Ultima Upsurge", "sheet_time": "1:39", "time": 81.6,
 		"new": {"White Mage": ["confession"], "Astrologian": ["collective_unconscious"],
 			"Scholar": ["sacred_soil"], "Sage": ["kerachole"]},
 		"carry": {}},
-	{"name": "Death Bolt/Wave", "sheet_time": "1:46", # 88.7
+	{"name": "Death Bolt/Wave", "sheet_time": "1:46", "time": 88.7,
 		"new": {},
 		"carry": {"White Mage": ["confession"], "Astrologian": ["collective_unconscious"],
 			"Scholar": ["sacred_soil"], "Sage": ["kerachole"]}},
-	{"name": "Ultima Upsurge", "sheet_time": "2:18", # 120.3
+	{"name": "Ultima Upsurge", "sheet_time": "2:18", "time": 120.3,
 		"new": {"Scholar": ["sacred_soil"], "Sage": ["kerachole"]},
 		"carry": {}},
 ]
@@ -57,4 +57,4 @@ const MECHANICS := [
 
 static func check(index: int, controller: HealerActionController, job_name: String,
 		fail_list: FailList) -> void:
-	HealerMitCheck.check(MECHANICS[index], controller, job_name, fail_list)
+	HealerMitCheck.check(MECHANICS, index, controller, job_name, fail_list)

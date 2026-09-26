@@ -510,13 +510,15 @@ func fors_4_hit():
 	lockon_controller.remove_marker(LockonController.STACK_MARKER, party[stack_tar_key])
 
 
-# 0:05.7, 0:11.0, 0:23.8, 0:36.5, 0:47.9, 1:06.7, 1:27.6, 1:33.1, 2:08.7 - Raidwide
-# hits (Repeater, Fell Forces, Flood, Maddening, Celestriad tower 1).
-# 2:38.0 - 3:07.0 - The 8 Forsaken/Forsaken Bonds hits (each fors_N_tele/_hit).
-# Healer Cooldowns: fail if the player's planned mitigation isn't up.
+# 0:05.7 - 3:07.0 - Every AoE hit (Repeater, Fell Forces autos, Flood hits,
+# Maddening hits, Celestriad towers, Entropy, the 8 Forsaken/Forsaken Bonds hits
+# on each fors_N_tele/_hit). See P5HealerMit.MECHANICS for the times.
+# Healer Cooldowns: fail if the player's planned mitigation or shield isn't up.
 func check_healer_mit(index: int) -> void:
 	var healer_bar: HealerAbilityBar = action_bar.healer_ability_bar
 	if Global.spectate_mode or not healer_bar.visible:
+		return
+	if index == P5HealerMit.PRE_FLOOD_AUTO and starting_point == StartPoint.FLOOD:
 		return
 	P5HealerMit.check(index, healer_bar.controller, healer_bar.job_name, fail_list)
 

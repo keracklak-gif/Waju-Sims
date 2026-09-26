@@ -36,6 +36,7 @@ const GCD := 2.5
 const ANIMATION_LOCK := 0.6
 const CASTER_TAX := 0.1
 const QUEUE_WINDOW := 0.5
+const HISTORY_SIZE := 64
 
 var gcd_left := 0.0
 var gcd_total := GCD
@@ -51,6 +52,11 @@ var status_sources := {}  # status -> id of the ability that granted it
 var expired_at := {}  # status -> clock time it ran out (not when consumed)
 var clock := 0.0
 var abilities := {}  # id -> ability
+var cast_started_at := 0.0
+## Recent actions that went off: {"id", "gcd", "start" (press/cast start),
+## "end" (effect time), "granted" (statuses), "had" (statuses up just before)}.
+var history: Array[Dictionary] = []
+var last_hit_at := -INF  # clock time of the last damaging hit
 
 
 func register(ability: Dictionary) -> void:
@@ -97,7 +103,7 @@ func tick(delta: float) -> void:
 			casting_ability = {}
 			cast_left = 0.0
 			lock_left = CASTER_TAX
-			apply_effects(ability)
+			apply_effects(ability, cast_started_at)
 			cast_finished.emit(ability)
 	if not queued_ability.is_empty() and time_until_ready(queued_ability) <= 0.0:
 		var ability := queued_ability
@@ -134,13 +140,15 @@ func execute(ability: Dictionary) -> void:
 	if ability.get("cast_time", 0.0) > 0.0:
 		casting_ability = ability
 		cast_left = ability["cast_time"] * gcd_scale
+		cast_started_at = clock
 		cast_started.emit(ability)
 	else:
 		lock_left = ANIMATION_LOCK
-		apply_effects(ability)
+		apply_effects(ability, clock)
 
 
-func apply_effects(ability: Dictionary) -> void:
+func apply_effects(ability: Dictionary, started_at: float) -> void:
+	var had := statuses.keys()
 	var grants: Dictionary = ability.get("grants", {})
 	var boost: Dictionary = ability.get("boost", {})
 	if not boost.is_empty() and statuses.has(boost["status"]):
@@ -162,6 +170,10 @@ func apply_effects(ability: Dictionary) -> void:
 		statuses[status] = durations[status]
 		status_sources[status] = ability["id"]
 		expired_at.erase(status)
+	history.append({"id": ability["id"], "gcd": ability.get("gcd", false), "start": started_at,
+		"end": clock, "granted": durations.keys(), "had": had})
+	if history.size() > HISTORY_SIZE:
+		history.pop_front()
 	ability_executed.emit(ability)
 
 
@@ -169,6 +181,14 @@ func apply_effects(ability: Dictionary) -> void:
 func absorb_hit(shields: Array) -> void:
 	for status: String in shields:
 		statuses.erase(status)
+	last_hit_at = clock
+
+
+## What each outcome of the ability could grant: its grants and its boost's.
+static func possible_grants(ability: Dictionary) -> Array:
+	var grants: Array = ability.get("grants", {}).keys()
+	grants.append_array(ability.get("boost", {}).get("grants", {}).keys())
+	return grants
 
 
 ## Requirements and recast/charges only - ignores GCD, cast and lock timing.
