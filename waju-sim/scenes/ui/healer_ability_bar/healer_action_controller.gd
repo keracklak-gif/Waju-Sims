@@ -56,7 +56,7 @@ var cast_started_at := 0.0
 ## Recent actions that went off: {"id", "gcd", "start" (press/cast start),
 ## "end" (effect time), "granted" (statuses), "had" (statuses up just before)}.
 var history: Array[Dictionary] = []
-var last_hit_at := -INF  # clock time of the last damaging hit
+var last_hit_at := -INF  # clock time the player last took a damaging hit
 
 
 func register(ability: Dictionary) -> void:
@@ -177,11 +177,12 @@ func apply_effects(ability: Dictionary, started_at: float) -> void:
 	ability_executed.emit(ability)
 
 
-## A damaging hit landed: shields absorb it and are used up.
-func absorb_hit(shields: Array) -> void:
+## A damaging hit landed on the player (at clock time hit_at, default now):
+## shields absorb it and are used up.
+func absorb_hit(shields: Array, hit_at := -1.0) -> void:
 	for status: String in shields:
 		statuses.erase(status)
-	last_hit_at = clock
+	last_hit_at = hit_at if hit_at >= 0.0 else clock
 
 
 ## What each outcome of the ability could grant: its grants and its boost's.

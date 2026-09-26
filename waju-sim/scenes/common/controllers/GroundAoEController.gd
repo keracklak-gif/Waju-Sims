@@ -6,6 +6,9 @@
 extends Node
 class_name GroundAoeController
 
+## A circle, donut or line AoE checked who it hit.
+signal aoe_resolved(bodies: Array)
+
 enum {CIRCLE, DONUT, LINE, TOWER, CONE, LR_TOWER, PR_TOWER, WIDE_CONE}
 
 const CIRCLE_Y := 0.11
@@ -66,6 +69,7 @@ color: Color, fail_conditions: Array = [], check_at_end: bool = false) -> Circle
 	new_circle.set_parameters(Vector3(position.x, CIRCLE_Y, position.y), radius,
 		lifetime, color, fail_conditions, check_at_end)
 	new_circle.play_start_animation()
+	new_circle.collisions_checked.connect(on_collisions_checked)
 	if !check_at_end:
 		new_circle.await_collision()
 	return new_circle
@@ -85,6 +89,7 @@ func spawn_donut(position: Vector2, inner_radius: float,
 	marker_layer.add_child(new_donut)
 	new_donut.set_parameters(Vector3(position.x, DONUT_Y, position.y), inner_radius, outter_radius,
 		lifetime, color, fail_conditions)
+	new_donut.collisions_checked.connect(on_collisions_checked)
 	if check_at_end:
 		new_donut.check_at_end()
 	else:
@@ -105,6 +110,7 @@ func spawn_line(position: Vector2, width: float, length: float,
 	new_line.set_parameters(Vector3(position.x, LINE_Y, position.y), width, length,
 	 target, lifetime, color, fail_conditions)
 	new_line.play_start_animation()
+	new_line.collisions_checked.connect(on_collisions_checked)
 	if check_at_end:
 		new_line.check_at_end()
 	else:
@@ -257,6 +263,10 @@ color: Color, fail_conditions: Array = []) -> AscalonCone:
 	new_cone.play_start_animation()
 	new_cone.await_collision()
 	return new_cone
+
+
+func on_collisions_checked(bodies: Array, _marker: Node3D) -> void:
+	aoe_resolved.emit(bodies)
 
 
 

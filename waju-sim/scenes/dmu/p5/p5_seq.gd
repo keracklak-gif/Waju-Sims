@@ -72,6 +72,8 @@ const NON_TANK_KEYS := ["h1", "h2", "m1", "m2", "r1", "r2"]
 const MAD_SCOOT_DIST := 5.0
 const CELEST_SCOOT_DIST := 4.0
 const _RS1 := Vector2(0.3, 0.2)
+# Healer Cooldowns: how long to collect who an AoE hit before checking.
+const AOE_HIT_WAIT := 0.1
 
 @onready var target_controller: TargetController = %TargetController
 @onready var gac: GroundAoeController = %GroundAoEController
@@ -520,7 +522,29 @@ func check_healer_mit(index: int) -> void:
 		return
 	if index == P5HealerMit.PRE_FLOOD_AUTO and starting_point == StartPoint.FLOOD:
 		return
-	P5HealerMit.check(index, healer_bar.controller, healer_bar.job_name, fail_list)
+	var controller := healer_bar.controller
+	var hit_at := controller.clock
+	var player_hit := true
+	if P5HealerMit.MECHANICS[index].get("targets", "all") == "aoe":
+		player_hit = await aoe_hits_player()
+		if not is_instance_valid(healer_bar):
+			return
+	P5HealerMit.check(index, controller, healer_bar.job_name, fail_list, player_hit, hit_at)
+
+
+# True if an AoE spawned this moment hits the player. AoEs report who they hit
+# a couple of frames after spawning.
+func aoe_hits_player() -> bool:
+	var hit := [false]
+	var on_resolved := func(bodies: Array) -> void:
+		for body in bodies:
+			if body is PlayableCharacter and body.is_player():
+				hit[0] = true
+	gac.aoe_resolved.connect(on_resolved)
+	await get_tree().create_timer(AOE_HIT_WAIT).timeout
+	if gac.aoe_resolved.is_connected(on_resolved):
+		gac.aoe_resolved.disconnect(on_resolved)
+	return hit[0]
 
 
 ## ===========================END OF TIMELINE===================================

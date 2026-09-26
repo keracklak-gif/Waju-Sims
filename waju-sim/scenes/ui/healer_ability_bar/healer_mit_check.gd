@@ -9,22 +9,27 @@
 ## timeline, "new" = buffs the job must have freshly up (the healer sheet's
 ## plain text), "carry" = buffs that must still be lasting from an earlier hit
 ## (the sheet's grey "->" text), each keyed by job name. Hits the sheet has no
-## plan for leave both empty and only check the healing shield.
+## plan for leave both empty and only check the healing shield. Optional:
+## "targets": "aoe" = only some players get hit (the phase says whether the
+## player was), "strict": true = always needs a fresh shield (see below).
 ##
-## Healing shield ("All mechanics requires shields!"): every hit uses up a
-## shield healer's GCD shield, so they must reapply it between hits.
-## - A hit at least MIN_SHIELD_GAP after the previous one leaves time to, so
-##   the shield must be up. Any of the job's shields counts; a hit that plans a
-##   specific one (Spreadlo, Zoe shields) needs that one instead.
-## - Faster hits (Flood, Fell Forces autos, back-to-back Forsaken) don't, so
-##   there the healer just has to keep reapplying it as much as possible: the
-##   shield is up, or they've been working on it since the last hit (casting
-##   it, or pressed Eukrasia for it). And never cast one over a shield that's
-##   still up, which wastes the GCD.
+## Healing shield ("All mechanics requires shields!"), judged on the player
+## alone: a hit that lands on the player uses up their GCD shield, so a shield
+## healer must reapply it before the next hit on them. Hits that miss the
+## player neither need nor use it.
+## - A hit at least MIN_SHIELD_GAP after the player's last one leaves time to
+##   reshield, so the shield must be up. So must every "strict" hit. Any of
+##   the job's shields counts; a hit that plans a specific one (Spreadlo, Zoe
+##   shields) needs that one instead.
+## - Faster hits (Flood, back-to-back Fell Forces autos) don't, so there the
+##   healer just has to keep reapplying it as much as possible: the shield is
+##   up, or they've been working on it since the last hit (casting it, or
+##   pressed Eukrasia for it). And never cast one over a shield that's still
+##   up, which wastes the GCD.
 
 class_name HealerMitCheck
 
-## Seconds between hits needed to reapply a shield: a GCD (2.5s) plus room to
+## Seconds between hits on the player needed to reapply a shield: a GCD (2.5s) plus room to
 ## react and weave.
 const MIN_SHIELD_GAP := 4.0
 
@@ -39,10 +44,11 @@ const HEALING_SHIELDS := {
 
 
 ## Adds a fail for each planned buff the player's job is missing at this hit,
-## then lets the hit use up the player's shields.
-static func check(mechanics: Array, index: int, controller: HealerActionController,
-		job_name: String, fail_list: FailList) -> void:
-	var mechanic: Dictionary = mechanics[index]
+## then, if it hit the player, checks their healing shield and uses up their shields.
+## player_hit: whether the hit landed on the player. hit_at: controller clock
+## time it landed (default now).
+static func check(mechanic: Dictionary, controller: HealerActionController, job_name: String,
+		fail_list: FailList, player_hit := true, hit_at := -1.0) -> void:
 	for status: String in mechanic["new"].get(job_name, []):
 		if not controller.statuses.has(status):
 			fail_list.add_fail("Player didn't have %s up for %s." % [
@@ -56,9 +62,13 @@ static func check(mechanics: Array, index: int, controller: HealerActionControll
 		else:
 			fail_list.add_fail("Player didn't have %s up for %s." % [
 				HealerAbilities.status_name(status), mechanic["name"]])
-	var gap: float = mechanic["time"] - mechanics[index - 1]["time"] if index > 0 else INF
+	if not player_hit:
+		return
+	if hit_at < 0.0:
+		hit_at = controller.clock
+	var gap := INF if mechanic.get("strict", false) else hit_at - controller.last_hit_at
 	check_healing_shield(mechanic, gap, controller, job_name, fail_list)
-	controller.absorb_hit(HealerAbilities.SHIELDS)
+	controller.absorb_hit(HealerAbilities.SHIELDS, hit_at)
 
 
 static func check_healing_shield(mechanic: Dictionary, gap: float,

@@ -57,4 +57,4 @@ const MECHANICS := [
 
 static func check(index: int, controller: HealerActionController, job_name: String,
 		fail_list: FailList) -> void:
-	HealerMitCheck.check(MECHANICS, index, controller, job_name, fail_list)
+	HealerMitCheck.check(MECHANICS[index], controller, job_name, fail_list)
