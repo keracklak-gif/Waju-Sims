@@ -30,6 +30,7 @@ var save_data: Dictionary = {
 		"p3_eq_bh_prio": 0,   # [D>S>A, S>D>A, Double]
 		"p5_strat": 0,
 		"p5_start_point" : 0,
+		"p5_healer_cooldowns": false,
 		"p4_bobot_callouts": true,
 		"p4_macro_bar": false,
 		"p4_labeling_macros": false,

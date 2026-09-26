@@ -72,6 +72,8 @@ const NON_TANK_KEYS := ["h1", "h2", "m1", "m2", "r1", "r2"]
 const MAD_SCOOT_DIST := 5.0
 const CELEST_SCOOT_DIST := 4.0
 const _RS1 := Vector2(0.3, 0.2)
+# Healer Cooldowns: how long to collect who an AoE hit before checking.
+const AOE_HIT_WAIT := 0.1
 
 @onready var target_controller: TargetController = %TargetController
 @onready var gac: GroundAoeController = %GroundAoEController
@@ -84,6 +86,7 @@ const _RS1 := Vector2(0.3, 0.2)
 @onready var enemy_cast_bar: EnemyCastBar = %EnemyCastBar
 @onready var celest_towers: CelestTowers = %CelestTowers
 @onready var fail_list: FailList = %FailList
+@onready var action_bar: CanvasLayer = %ActionBar
 @onready var special_markers: Node3D = %SpecialMarkers
 @onready var earth_rings: Node3D = %EarthRings
 @onready var wind_rings: Node3D = %WindRings
@@ -117,6 +120,8 @@ func start_sequence(new_party: Dictionary) -> void:
 	instantiate_party(new_party)
 	on_toggle_bots_visible()
 	encounter_menu.toggle_bots_visible.connect(on_toggle_bots_visible)
+	on_toggle_healer_cooldowns(DmuSavedVariables.get_data_and_check_bool("settings", "p5_healer_cooldowns"))
+	encounter_menu.toggle_healer_cooldowns.connect(on_toggle_healer_cooldowns)
 	## Start animation sequence
 	match starting_point:
 		StartPoint.FLOOD:
@@ -507,6 +512,41 @@ func fors_4_hit():
 	lockon_controller.remove_marker(LockonController.STACK_MARKER, party[stack_tar_key])
 
 
+# 0:05.7 - 3:07.0 - Every AoE hit (Repeater, Fell Forces autos, Flood hits,
+# Maddening hits, Celestriad towers, Entropy, the 8 Forsaken/Forsaken Bonds hits
+# on each fors_N_tele/_hit). See P5HealerMit.MECHANICS for the times.
+# Healer Cooldowns: fail if the player's planned mitigation or shield isn't up.
+func check_healer_mit(index: int) -> void:
+	var healer_bar: HealerAbilityBar = action_bar.healer_ability_bar
+	if Global.spectate_mode or not healer_bar.visible:
+		return
+	if index == P5HealerMit.PRE_FLOOD_AUTO and starting_point == StartPoint.FLOOD:
+		return
+	var controller := healer_bar.controller
+	var hit_at := controller.clock
+	var player_hit := true
+	if P5HealerMit.MECHANICS[index].get("targets", "all") == "aoe":
+		player_hit = await aoe_hits_player()
+		if not is_instance_valid(healer_bar):
+			return
+	P5HealerMit.check(index, controller, healer_bar.job_name, fail_list, player_hit, hit_at)
+
+
+# True if an AoE spawned this moment hits the player. AoEs report who they hit
+# a couple of frames after spawning.
+func aoe_hits_player() -> bool:
+	var hit := [false]
+	var on_resolved := func(bodies: Array) -> void:
+		for body in bodies:
+			if body is PlayableCharacter and body.is_player():
+				hit[0] = true
+	gac.aoe_resolved.connect(on_resolved)
+	await get_tree().create_timer(AOE_HIT_WAIT).timeout
+	if gac.aoe_resolved.is_connected(on_resolved):
+		gac.aoe_resolved.disconnect(on_resolved)
+	return hit[0]
+
+
 ## ===========================END OF TIMELINE===================================
 
 
@@ -685,6 +725,11 @@ func on_toggle_bots_visible() -> void:
 		if pc.is_player():
 			continue
 		pc.visible = bots_visible
+
+
+# Healer casting practice: the filler cast button and the healer cooldown bar.
+func on_toggle_healer_cooldowns(is_visible: bool) -> void:
+	action_bar.set_healer_cooldowns_visible(is_visible)
 
 
 func get_nearest_player_keys(position: Vector2, count: int) -> Array:
